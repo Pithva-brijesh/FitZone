@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Header from "../../components/ui/Header";
 import useAuth from "../../hooks/useAuth";
+
+import { getProfile } from "../../services/profileService";
 
 import PersonalizedGreeting from "./components/PersonalizedGreeting";
 import QuickStatsCard from "./components/QuickStatsCard";
@@ -60,7 +62,9 @@ const upcomingChallenges = [
     target: 30,
     unit: "days",
     difficulty: "intermediate",
-    endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+    endDate: new Date(
+      Date.now() + 10 * 24 * 60 * 60 * 1000
+    ),
     participants: 2500,
     reward: "500 pts",
   },
@@ -99,9 +103,24 @@ const currentGoals = [
 ];
 
 export default function DashboardHome() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
-  if (loading) {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  if (loading || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
@@ -109,17 +128,16 @@ export default function DashboardHome() {
     );
   }
 
-
-
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+
+      <Header user={profile} />
 
       <main className="container mx-auto p-6 space-y-6">
 
         <PersonalizedGreeting
-          user={user}
-          streak={user?.user_metadata?.streak ?? 0}
+          user={profile}
+          streak={profile.streak}
           motivationalQuote={quote}
         />
 
@@ -139,8 +157,10 @@ export default function DashboardHome() {
         />
 
         <QuickActions
-          user={user}
-          onQuickStart={() => alert("Workout Started")}
+          user={profile}
+          onQuickStart={() =>
+            alert("Workout Started")
+          }
         />
 
         <PersonalBadges
@@ -149,6 +169,7 @@ export default function DashboardHome() {
         />
 
       </main>
+
     </div>
   );
 }

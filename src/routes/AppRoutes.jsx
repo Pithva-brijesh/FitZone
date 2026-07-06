@@ -15,6 +15,7 @@ import WorkoutHistory from "../pages/workout-history";
 import Achievements from "../pages/achievements";
 import Notifications from "../pages/notifications";
 import Settings from "../pages/settings";
+import ProfileSetup from "../pages/profile-setup";
 
 function PublicRoute() {
   const { user, loading } = useAuth();
@@ -144,6 +145,15 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile-setup"
+          element={
+            <ProtectedRoute>
+              <ProfileSetup />
             </ProtectedRoute>
           }
         />
