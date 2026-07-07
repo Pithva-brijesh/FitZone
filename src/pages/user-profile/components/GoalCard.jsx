@@ -2,18 +2,26 @@ import React from "react";
 import Icon from "../../../components/AppIcon";
 
 export default function GoalCard({ user }) {
-  const startWeight = 85;
-  const currentWeight = user.weight;
-  const goalWeight = user.goalWeight;
+  const currentWeight = Number(user?.weight);
+  const goalWeight = Number(user?.goalWeight ?? user?.goal_weight);
 
-  const progress = Math.min(
-    100,
-    Math.round(
-      ((startWeight - currentWeight) /
-        (startWeight - goalWeight)) *
-        100
-    )
-  );
+  let progress = 0;
+  let remaining = "--";
+
+  if (!isNaN(currentWeight) && !isNaN(goalWeight)) {
+    remaining = Math.abs(currentWeight - goalWeight).toFixed(1);
+
+    // Temporary progress calculation
+    const difference = Math.abs(currentWeight - goalWeight);
+
+    progress = Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round((1 - difference / currentWeight) * 100)
+      )
+    );
+  }
 
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
@@ -23,17 +31,14 @@ export default function GoalCard({ user }) {
       <div className="flex items-center gap-3 mb-6">
 
         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-
           <Icon
             name="Target"
             size={24}
             className="text-primary"
           />
-
         </div>
 
         <div>
-
           <h2 className="text-2xl font-bold text-foreground">
             Fitness Goal
           </h2>
@@ -41,7 +46,6 @@ export default function GoalCard({ user }) {
           <p className="text-muted-foreground">
             Stay focused every day
           </p>
-
         </div>
 
       </div>
@@ -84,7 +88,7 @@ export default function GoalCard({ user }) {
           </div>
 
           <div className="text-3xl font-bold text-success mt-2">
-            {currentWeight}
+            {currentWeight || "--"}
           </div>
 
           <div className="text-xs text-muted-foreground mt-1">
@@ -100,7 +104,7 @@ export default function GoalCard({ user }) {
           </div>
 
           <div className="text-3xl font-bold text-warning mt-2">
-            {goalWeight}
+            {goalWeight || "--"}
           </div>
 
           <div className="text-xs text-muted-foreground mt-1">
@@ -122,7 +126,7 @@ export default function GoalCard({ user }) {
           </span>
 
           <span className="font-semibold text-foreground">
-            {(currentWeight - goalWeight).toFixed(1)} kg
+            {remaining} kg
           </span>
 
         </div>
@@ -130,11 +134,11 @@ export default function GoalCard({ user }) {
         <div className="flex justify-between">
 
           <span className="text-muted-foreground">
-            Estimated Finish
+            Goal
           </span>
 
           <span className="font-semibold text-foreground">
-            8 Weeks
+            {user?.fitness_goal || "Stay Fit"}
           </span>
 
         </div>
@@ -160,8 +164,7 @@ export default function GoalCard({ user }) {
             </h4>
 
             <p className="text-sm text-muted-foreground mt-2">
-              Every workout brings you one step closer to your dream physique.
-              Stay consistent—you've already come a long way!
+              Every workout brings you one step closer to your goal. Stay consistent and trust the process!
             </p>
 
           </div>
@@ -171,5 +174,5 @@ export default function GoalCard({ user }) {
       </div>
 
     </div>
-);
+  );
 }

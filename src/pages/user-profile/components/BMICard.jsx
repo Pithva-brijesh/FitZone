@@ -2,39 +2,47 @@ import React from "react";
 import Icon from "../../../components/AppIcon";
 
 export default function BMICard({ user }) {
-  const bmi = (
-    user.weight /
-    Math.pow(user.height / 100, 2)
-  ).toFixed(1);
+  const height = Number(user?.height);
+  const weight = Number(user?.weight);
 
-  let status = "Healthy";
-  let color = "text-success";
-  let bg = "bg-success/10";
+  let bmi = "--";
+  let status = "Not Available";
+  let color = "text-muted-foreground";
+  let bg = "bg-muted";
   let advice =
-    "Great job! Maintain your current routine and balanced nutrition.";
+    "Complete your profile to receive your BMI analysis.";
 
-  if (bmi < 18.5) {
-    status = "Underweight";
-    color = "text-warning";
-    bg = "bg-warning/10";
-    advice =
-      "Increase your calorie and protein intake while following a strength program.";
-  }
+  if (height > 0 && weight > 0) {
+    bmi = (
+      weight /
+      Math.pow(height / 100, 2)
+    ).toFixed(1);
 
-  if (bmi >= 25) {
-    status = "Overweight";
-    color = "text-warning";
-    bg = "bg-warning/10";
-    advice =
-      "Focus on cardio, strength training, and maintaining a calorie deficit.";
-  }
-
-  if (bmi >= 30) {
-    status = "Obese";
-    color = "text-red-500";
-    bg = "bg-red-500/10";
-    advice =
-      "Consult a healthcare professional and begin a gradual fitness plan.";
+    if (bmi < 18.5) {
+      status = "Underweight";
+      color = "text-warning";
+      bg = "bg-warning/10";
+      advice =
+        "Increase your calorie and protein intake while following a strength program.";
+    } else if (bmi < 25) {
+      status = "Healthy";
+      color = "text-success";
+      bg = "bg-success/10";
+      advice =
+        "Great job! Maintain your current routine and balanced nutrition.";
+    } else if (bmi < 30) {
+      status = "Overweight";
+      color = "text-warning";
+      bg = "bg-warning/10";
+      advice =
+        "Focus on cardio, strength training, and maintaining a calorie deficit.";
+    } else {
+      status = "Obese";
+      color = "text-red-500";
+      bg = "bg-red-500/10";
+      advice =
+        "Consult a healthcare professional and begin a gradual fitness plan.";
+    }
   }
 
   return (
@@ -43,17 +51,14 @@ export default function BMICard({ user }) {
       <div className="flex items-center gap-3 mb-6">
 
         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-
           <Icon
             name="HeartPulse"
             size={24}
             className="text-primary"
           />
-
         </div>
 
         <div>
-
           <h2 className="text-2xl font-bold text-foreground">
             BMI Overview
           </h2>
@@ -61,12 +66,9 @@ export default function BMICard({ user }) {
           <p className="text-muted-foreground">
             Body Mass Index Analysis
           </p>
-
         </div>
 
       </div>
-
-      {/* BMI Score */}
 
       <div className="text-center py-6">
 
@@ -77,7 +79,6 @@ export default function BMICard({ user }) {
         <div
           className={`inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full ${bg}`}
         >
-
           <Icon
             name="BadgeCheck"
             size={18}
@@ -91,8 +92,6 @@ export default function BMICard({ user }) {
         </div>
 
       </div>
-
-      {/* Healthy Range */}
 
       <div className="bg-muted rounded-2xl p-5 mt-6">
 
@@ -109,14 +108,10 @@ export default function BMICard({ user }) {
         </div>
 
         <div className="w-full bg-background rounded-full h-3 overflow-hidden">
-
           <div className="w-3/4 bg-success h-3 rounded-full"></div>
-
         </div>
 
       </div>
-
-      {/* Advice */}
 
       <div className="mt-6 bg-primary/5 rounded-2xl p-5 border border-primary/20">
 

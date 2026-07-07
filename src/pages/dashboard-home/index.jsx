@@ -18,16 +18,6 @@ const quote = {
   author: "FitZone",
 };
 
-const quickStats = {
-  weeklyWorkouts: 4,
-  weeklyTarget: 5,
-  totalMinutes: 240,
-  minutesTarget: 300,
-  caloriesBurned: 1850,
-  caloriesTarget: 2000,
-  level: 8,
-};
-
 const content = {
   id: 1,
   type: "exercise",
@@ -62,9 +52,7 @@ const upcomingChallenges = [
     target: 30,
     unit: "days",
     difficulty: "intermediate",
-    endDate: new Date(
-      Date.now() + 10 * 24 * 60 * 60 * 1000
-    ),
+    endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
     participants: 2500,
     reward: "500 pts",
   },
@@ -96,9 +84,7 @@ const currentGoals = [
     current: 6,
     target: 10,
     unit: "kg",
-    deadline: new Date(
-      Date.now() + 20 * 24 * 60 * 60 * 1000
-    ),
+    deadline: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
   },
 ];
 
@@ -128,16 +114,27 @@ export default function DashboardHome() {
     );
   }
 
+  const quickStats = {
+    weeklyWorkouts: 0,
+    weeklyTarget: 5,
+
+    totalMinutes: 0,
+    minutesTarget: 300,
+
+    caloriesBurned: profile.calories ?? 0,
+    caloriesTarget: 2000,
+
+    level: profile.level ?? 1,
+  };
+
   return (
     <div className="min-h-screen bg-background">
-
       <Header user={profile} />
 
       <main className="container mx-auto p-6 space-y-6">
-
         <PersonalizedGreeting
           user={profile}
-          streak={profile.streak}
+          streak={profile.streak ?? 0}
           motivationalQuote={quote}
         />
 
@@ -158,18 +155,14 @@ export default function DashboardHome() {
 
         <QuickActions
           user={profile}
-          onQuickStart={() =>
-            alert("Workout Started")
-          }
+          onQuickStart={() => alert("Workout Started")}
         />
 
         <PersonalBadges
           badges={personalBadges}
           currentGoals={currentGoals}
         />
-
       </main>
-
     </div>
   );
 }

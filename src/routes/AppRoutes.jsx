@@ -15,8 +15,7 @@ import WorkoutHistory from "../pages/workout-history";
 import Achievements from "../pages/achievements";
 import Notifications from "../pages/notifications";
 import Settings from "../pages/settings";
-import ProfileSetup from "../pages/profile-setup";
-
+import ProfileSetup from "../pages/profile-setup/index.jsx";
 function PublicRoute() {
   const { user, loading } = useAuth();
 

@@ -3,6 +3,11 @@ import Button from "../../../components/ui/Button";
 import Icon from "../../../components/AppIcon";
 
 export default function ProfileHeader({ user }) {
+  const avatarLetter =
+    (user?.name || user?.full_name || "U")
+      .charAt(0)
+      .toUpperCase();
+
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
 
@@ -16,11 +21,17 @@ export default function ProfileHeader({ user }) {
 
           <div className="relative">
 
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-36 h-36 rounded-full object-cover border-4 border-primary shadow-lg"
-            />
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-36 h-36 rounded-full object-cover border-4 border-primary shadow-lg"
+              />
+            ) : (
+              <div className="w-36 h-36 rounded-full bg-primary flex items-center justify-center text-5xl font-bold text-white border-4 border-primary shadow-lg">
+                {avatarLetter}
+              </div>
+            )}
 
             <button
               className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg hover:scale-110 transition"
@@ -39,11 +50,11 @@ export default function ProfileHeader({ user }) {
           <div>
 
             <h1 className="text-4xl font-bold font-poppins text-foreground">
-              {user.name}
+              {user?.name || user?.full_name}
             </h1>
 
             <p className="text-lg text-primary mt-2">
-              {user.level}
+              {user?.activity_level || "Beginner"}
             </p>
 
             <div className="flex flex-wrap gap-4 mt-5">
@@ -55,7 +66,7 @@ export default function ProfileHeader({ user }) {
                   size={18}
                 />
 
-                {user.email}
+                {user?.email}
 
               </div>
 
@@ -66,7 +77,7 @@ export default function ProfileHeader({ user }) {
                   size={18}
                 />
 
-                {user.streak} Day Streak
+                {user?.streak ?? 0} Day Streak
 
               </div>
 
@@ -79,7 +90,7 @@ export default function ProfileHeader({ user }) {
               <div className="bg-primary/10 rounded-xl p-4 text-center">
 
                 <div className="text-2xl font-bold text-primary">
-                  {user.height}
+                  {user?.height ?? "-"}
                 </div>
 
                 <div className="text-sm text-muted-foreground">
@@ -91,7 +102,7 @@ export default function ProfileHeader({ user }) {
               <div className="bg-success/10 rounded-xl p-4 text-center">
 
                 <div className="text-2xl font-bold text-success">
-                  {user.weight}
+                  {user?.weight ?? "-"}
                 </div>
 
                 <div className="text-sm text-muted-foreground">
@@ -103,7 +114,7 @@ export default function ProfileHeader({ user }) {
               <div className="bg-warning/10 rounded-xl p-4 text-center">
 
                 <div className="text-2xl font-bold text-warning">
-                  {user.goalWeight}
+                  {user?.goalWeight ?? user?.goal_weight ?? "-"}
                 </div>
 
                 <div className="text-sm text-muted-foreground">

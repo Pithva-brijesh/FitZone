@@ -42,8 +42,7 @@ export default function RegisterForm({ onLogin }) {
 
       await register(fullName, email, password);
 
-      // Go to profile setup instead of dashboard
-      navigate("/profile-setup");
+      window.location.href = "/profile-setup";
 
     } catch (err) {
       setError(err.message);

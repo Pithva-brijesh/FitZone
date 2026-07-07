@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
@@ -11,22 +11,55 @@ import WeeklyActivity from "./components/WeeklyActivity";
 import FitnessLevel from "./components/FitnessLevel";
 import AchievementPreview from "./components/AchievementPreview";
 
+import { getProfile } from "../../services/profileService";
+
 export default function UserProfile() {
   const navigate = useNavigate();
 
-  const user = {
-    name: "Alex Chen",
-    email: "alex@fitzone.com",
-    age: 21,
-    gender: "Male",
-    height: 181,
-    weight: 79,
-    goalWeight: 75,
-    streak: 12,
-    level: "Intermediate Athlete",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500",
-  };
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profile = await getProfile();
+
+        setUser({
+          ...profile,
+
+          name: profile.full_name,
+          goalWeight: profile.goal_weight,
+
+          level: profile.level ?? 1,
+          streak: profile.streak ?? 0,
+
+          avatar: profile.avatar_url || null,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Profile not found.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,23 +73,19 @@ export default function UserProfile() {
 
         <ProfileHeader user={user} />
 
-        <ProfileStats />
+        <ProfileStats user={user} />
 
         <div className="grid lg:grid-cols-3 gap-8">
-
-          {/* LEFT */}
 
           <div className="lg:col-span-2 space-y-8">
 
             <PersonalInfo user={user} />
 
-            <WeeklyActivity />
+            <WeeklyActivity user={user} />
 
-            <AchievementPreview />
+            <AchievementPreview user={user} />
 
           </div>
-
-          {/* RIGHT */}
 
           <div className="space-y-8">
 
@@ -64,7 +93,7 @@ export default function UserProfile() {
 
             <GoalCard user={user} />
 
-            <FitnessLevel />
+            <FitnessLevel user={user} />
 
           </div>
 

@@ -1,32 +1,32 @@
 import React from "react";
 import Icon from "../../../components/AppIcon";
 
-export default function ProfileStats() {
+export default function ProfileStats({ user }) {
   const stats = [
     {
-      title: "Workouts",
-      value: "156",
-      icon: "Dumbbell",
+      title: "Level",
+      value: user?.level ?? 1,
+      icon: "TrendingUp",
       color: "text-primary",
       bg: "bg-primary/10",
     },
     {
       title: "Calories",
-      value: "12,420",
+      value: user?.calories ?? 0,
       icon: "Flame",
       color: "text-warning",
       bg: "bg-warning/10",
     },
     {
       title: "Workout Hours",
-      value: "248",
+      value: user?.workout_hours ?? 0,
       icon: "Clock3",
       color: "text-success",
       bg: "bg-success/10",
     },
     {
       title: "Achievements",
-      value: "32",
+      value: user?.achievements ?? 0,
       icon: "Award",
       color: "text-accent",
       bg: "bg-accent/10",

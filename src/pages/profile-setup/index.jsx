@@ -27,7 +27,7 @@ export default function ProfileSetup() {
       setLoading(true);
       setError("");
 
-      await updateProfile({
+      const result = await updateProfile({
         age: Number(age),
         gender,
         height: Number(height),
@@ -36,6 +36,11 @@ export default function ProfileSetup() {
         activity_level: activityLevel,
         fitness_goal: fitnessGoal,
       });
+
+      console.log("PROFILE UPDATED:", result);
+
+      // TEMPORARY
+      window.location.href = "/dashboard-home";
 
       navigate("/dashboard-home");
     } catch (err) {
