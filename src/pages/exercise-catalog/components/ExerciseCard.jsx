@@ -6,8 +6,8 @@ import Button from "../../../components/ui/Button";
 
 export default function ExerciseCard({
   exercise = {},
-  onBookmark = () => {},
-  onAddToRoutine = () => {},
+  onBookmark = () => { },
+  onAddToRoutine = () => { },
   isBookmarked = false,
 }) {
   const navigate = useNavigate();
@@ -30,9 +30,10 @@ export default function ExerciseCard({
   }
 
   function handleCardClick() {
-    navigate("/exercise-details", {
-      state: { exerciseId: exercise.id },
-    });
+    console.log("Clicked exercise:", exercise);
+    console.log("Exercise ID:", exercise.id);
+
+    navigate(`/exercise-details/${exercise.id}`);
   }
 
   return (
@@ -50,9 +51,8 @@ export default function ExerciseCard({
             "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600"
           }
           alt={exercise.name}
-          className={`w-full h-full object-cover ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={`w-full h-full object-cover ${imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
           onLoad={() => setImageLoaded(true)}
         />
 

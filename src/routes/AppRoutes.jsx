@@ -15,7 +15,8 @@ import WorkoutHistory from "../pages/workout-history";
 import Achievements from "../pages/achievements";
 import Notifications from "../pages/notifications";
 import Settings from "../pages/settings";
-import ProfileSetup from "../pages/profile-setup/index.jsx";
+import ProfileSetup from "../pages/profile-setup";
+
 function PublicRoute() {
   const { user, loading } = useAuth();
 
@@ -29,17 +30,17 @@ function PublicRoute() {
 }
 
 export default function AppRoutes() {
+  console.log("✅ APP ROUTES LOADED");
+
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Login */}
         <Route
           path="/login"
           element={<PublicRoute />}
         />
 
-        {/* Dashboard */}
         <Route
           path="/"
           element={
@@ -68,7 +69,7 @@ export default function AppRoutes() {
         />
 
         <Route
-          path="/exercise-details"
+          path="/exercise-details/:id"
           element={
             <ProtectedRoute>
               <ExerciseDetailsPage />
@@ -154,6 +155,22 @@ export default function AppRoutes() {
             <ProtectedRoute>
               <ProfileSetup />
             </ProtectedRoute>
+          }
+        />
+
+        {/* DEBUG ROUTE */}
+        <Route
+          path="*"
+          element={
+            <div
+              style={{
+                color: "white",
+                fontSize: "32px",
+                padding: "50px",
+              }}
+            >
+              ❌ 404 ROUTE
+            </div>
           }
         />
 

@@ -1,5 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "../../lib/supabase";
 
 import Header from "../../components/ui/Header";
 import ExerciseVideoPlayer from "./components/ExerciseVideoPlayer";
@@ -8,6 +9,10 @@ import ExerciseActions from "./components/ExerciseActions";
 
 export default function ExerciseDetailsPage() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [loading, setLoading] = useState(true);
+  const [exercise, setExercise] = useState(null);
 
   const user = {
     name: "Alex Johnson",
@@ -21,59 +26,96 @@ export default function ExerciseDetailsPage() {
     unreadNotifications: 3,
   };
 
-  const exercise = {
-    id: 1,
-    name: "Plank Hold",
-    category: "Core",
-    difficulty: "Beginner",
-    duration: "30-60 sec",
+  useEffect(() => {
+    async function loadExercise() {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error(error);
+      } else {
+        setExercise(data);
+      }
+
+      setLoading(false);
+    }
+
+    if (id) {
+      loadExercise();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!exercise) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl">
+        Exercise not found.
+      </div>
+    );
+  }
+
+  const exerciseData = {
+    ...exercise,
+
     thumbnail:
-      "https://images.unsplash.com/photo-1718633625616-e5f297177a26?w=1200",
-    thumbnailAlt: "Plank Exercise",
+      exercise.image_url ||
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
+
+    thumbnailAlt: exercise.name,
+
     videoUrl: "",
 
-    instructions: [
-      "Start in a push-up position.",
-      "Place your forearms on the floor.",
-      "Keep your body in a straight line.",
-      "Engage your core muscles.",
-      "Hold the position while breathing normally.",
-      "Lower your knees if you cannot maintain proper form.",
-    ],
+    duration: `${exercise.calories_per_min} Cal/min`,
 
-    primaryMuscles: [
-      "Rectus Abdominis",
-      "Obliques",
-      "Transverse Abdominis",
-    ],
+    instructions: exercise.instructions
+      ? exercise.instructions
+          .split(".")
+          .map((step) => step.trim())
+          .filter(Boolean)
+      : [],
 
-    secondaryMuscles: [
-      "Shoulders",
-      "Glutes",
-      "Lower Back",
-    ],
+    primaryMuscles: exercise.muscle_group
+      ? [exercise.muscle_group]
+      : [],
 
-    equipment: [],
+    secondaryMuscles: [],
+
+    equipment:
+      exercise.equipment && exercise.equipment !== "None"
+        ? [{ name: exercise.equipment }]
+        : [],
 
     safetyTips: [
-      "Keep your neck neutral.",
-      "Do not let your hips sag.",
-      "Avoid arching your lower back.",
+      "Warm up before starting.",
+      "Maintain proper posture.",
+      "Avoid sudden movements.",
       "Stop immediately if you feel pain.",
     ],
   };
 
-  const handleBookmark = (exerciseId, isBookmarked) => {
-    console.log("Bookmark:", exerciseId, isBookmarked);
-  };
+  function handleBookmark(id, bookmarked) {
+    console.log(id, bookmarked);
+  }
 
-  const handleShare = (exerciseId, platform) => {
-    console.log("Share:", exerciseId, platform);
-  };
+  function handleShare(id, platform) {
+    console.log(id, platform);
+  }
 
-  const handleStartWorkout = (exercise) => {
-    console.log("Start Workout:", exercise.name);
-  };
+  function handleStartWorkout(exercise) {
+    console.log(exercise);
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,8 +125,11 @@ export default function ExerciseDetailsPage() {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         {/* Breadcrumb */}
+
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
+
           <button
             onClick={() => navigate("/dashboard-home")}
             className="hover:text-foreground"
@@ -104,47 +149,64 @@ export default function ExerciseDetailsPage() {
           <span>/</span>
 
           <span className="text-foreground font-medium">
-            {exercise.name}
+            {exerciseData.name}
           </span>
+
         </nav>
 
-        {/* Page Header */}
+        {/* Header */}
+
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+
           <div>
+
             <h1 className="text-4xl font-bold text-foreground">
-              {exercise.name}
+              {exerciseData.name}
             </h1>
 
             <div className="flex gap-6 mt-3 text-sm text-muted-foreground">
-              <span>🏋 {exercise.category}</span>
-              <span>📈 {exercise.difficulty}</span>
-              <span>⏱ {exercise.duration}</span>
+
+              <span>🏋 {exerciseData.category}</span>
+
+              <span>📈 {exerciseData.difficulty}</span>
+
+              <span>🔥 {exerciseData.calories_per_min} Cal/min</span>
+
             </div>
+
           </div>
+
         </div>
 
-        {/* Rocket Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            <ExerciseVideoPlayer exercise={exercise} />
 
-            <ExerciseInformation exercise={exercise} />
+            <ExerciseVideoPlayer
+              exercise={exerciseData}
+            />
+
+            <ExerciseInformation
+              exercise={exerciseData}
+            />
+
           </div>
 
-          {/* Right Column */}
           <div className="space-y-8">
+
             <ExerciseActions
-              exercise={exercise}
+              exercise={exerciseData}
               onBookmark={handleBookmark}
               onShare={handleShare}
               onStartWorkout={handleStartWorkout}
             />
+
           </div>
 
         </div>
+
       </main>
+
     </div>
   );
 }
