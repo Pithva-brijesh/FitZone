@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import AddExerciseModal from "./components/AddExerciseModal";
-import { getRoutineExercises } from "../../services/routineExerciseService";
+import {
+  getRoutineExercises,
+  removeExercise,
+} from "../../services/routineExerciseService";
 
 export default function RoutineDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [routineExercises, setRoutineExercises] = useState([]);
@@ -23,6 +26,22 @@ export default function RoutineDetails() {
       console.error(err);
     }
   }
+  async function handleDeleteExercise(id) {
+    const ok = window.confirm(
+      "Remove this exercise from the routine?"
+    );
+
+    if (!ok) return;
+
+    try {
+      await removeExercise(id);
+
+      await loadRoutineExercises();
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-white">
@@ -34,9 +53,22 @@ export default function RoutineDetails() {
             Routine Details
           </h1>
 
-          <Button onClick={() => setShowModal(true)}>
-            + Add Exercise
-          </Button>
+          <div className="flex gap-3">
+
+            <Button
+              variant="outline"
+              onClick={() => setShowModal(true)}
+            >
+              + Add Exercise
+            </Button>
+
+            <Button
+              onClick={() => navigate(`/workout-session/${id}`)}
+            >
+              ▶ Start Workout
+            </Button>
+
+          </div>
         </div>
 
         {/* Exercise List */}
@@ -61,8 +93,20 @@ export default function RoutineDetails() {
                   </p>
                 </div>
 
-                <div className="text-sm text-gray-400">
-                  {item.sets || 3} Sets • {item.reps || 10} Reps
+                <div className="text-right">
+
+                  <div className="text-sm text-gray-400 mb-3">
+                    {item.sets || 3} Sets • {item.reps || 10} Reps
+                  </div>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteExercise(item.id)}
+                  >
+                    Remove
+                  </Button>
+
                 </div>
               </div>
             ))

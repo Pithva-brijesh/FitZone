@@ -38,11 +38,13 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
 
+        {/* Public */}
         <Route
           path="/login"
           element={<PublicRoute />}
         />
 
+        {/* Dashboard */}
         <Route
           path="/"
           element={
@@ -61,6 +63,7 @@ export default function AppRoutes() {
           }
         />
 
+        {/* Exercises */}
         <Route
           path="/exercise-catalog"
           element={
@@ -79,15 +82,7 @@ export default function AppRoutes() {
           }
         />
 
-        <Route
-          path="/progress-tracker"
-          element={
-            <ProtectedRoute>
-              <ProgressTracker />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Workout Session */}
         <Route
           path="/workout-session"
           element={
@@ -98,68 +93,15 @@ export default function AppRoutes() {
         />
 
         <Route
-          path="/user-profile"
+          path="/workout-session/:id"
           element={
             <ProtectedRoute>
-              <UserProfile />
+              <WorkoutSession />
             </ProtectedRoute>
           }
         />
 
-        <Route
-          path="/nutrition"
-          element={
-            <ProtectedRoute>
-              <Nutrition />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/workout-history"
-          element={
-            <ProtectedRoute>
-              <WorkoutHistory />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/achievements"
-          element={
-            <ProtectedRoute>
-              <Achievements />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile-setup"
-          element={
-            <ProtectedRoute>
-              <ProfileSetup />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Workout Routines */}
         <Route
           path="/workout-routines"
           element={
@@ -178,16 +120,91 @@ export default function AppRoutes() {
           }
         />
 
-        {/* DEBUG ROUTE */}
+        {/* Progress */}
+        <Route
+          path="/progress-tracker"
+          element={
+            <ProtectedRoute>
+              <ProgressTracker />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Profile */}
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile-setup"
+          element={
+            <ProtectedRoute>
+              <ProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Nutrition */}
+        <Route
+          path="/nutrition"
+          element={
+            <ProtectedRoute>
+              <Nutrition />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* History */}
+        <Route
+          path="/workout-history"
+          element={
+            <ProtectedRoute>
+              <WorkoutHistory />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Achievements */}
+        <Route
+          path="/achievements"
+          element={
+            <ProtectedRoute>
+              <Achievements />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Notifications */}
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 */}
         <Route
           path="*"
           element={
             <div
-              style={{
-                color: "white",
-                fontSize: "32px",
-                padding: "50px",
-              }}
+              className="min-h-screen bg-background text-white flex items-center justify-center text-4xl"
             >
               ❌ 404 ROUTE
             </div>

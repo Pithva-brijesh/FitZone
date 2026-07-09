@@ -1,59 +1,111 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { getWorkoutHistory } from "../../services/workoutHistoryService";
 import Header from "../../components/ui/Header";
-import WorkoutHistoryHeader from "./components/WorkoutHistoryHeader";
-import WeeklySummary from "./components/WeeklySummary";
-import SearchWorkout from "./components/SearchWorkout";
-import WorkoutCalendar from "./components/WorkoutCalendar";
-import WorkoutHistoryList from "./components/WorkoutHistoryList";
-import PersonalRecords from "./components/PersonalRecords";
-import FavoriteExercises from "./components/FavoriteExercises";
-import WorkoutNotes from "./components/WorkoutNotes";
-import MonthlyStatistics from "./components/MonthlyStatistics";
 
 export default function WorkoutHistory() {
-  const navigate = useNavigate();
 
-  const user = {
-    name: "Alex Chen",
-    email: "alex@test.com",
-    streak: 18,
-  };
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  async function loadHistory() {
+
+    try {
+
+      const data = await getWorkoutHistory();
+
+      setHistory(data);
+
+    } catch (err) {
+
+      console.error(err);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }
+
+  if (loading) {
+
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+
+  }
 
   return (
-  <div className="min-h-screen bg-background">
-    <Header
-      user={user}
-      onNavigate={(path) => navigate(path)}
-    />
 
-    <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+    <div className="min-h-screen bg-background">
 
-      <WorkoutHistoryHeader />
+      <Header />
 
-      <WeeklySummary />
+      <div className="max-w-6xl mx-auto py-12 px-6">
 
-      <SearchWorkout />
+        <h1 className="text-4xl font-bold mb-8">
+          Workout History
+        </h1>
 
-      <WorkoutCalendar />
+        {history.length === 0 ? (
 
-      <WorkoutHistoryList />
+          <div className="text-gray-400">
+            No workouts completed yet.
+          </div>
 
-      <div className="grid xl:grid-cols-2 gap-8">
+        ) : (
 
-        <PersonalRecords />
+          <div className="space-y-5">
 
-        <FavoriteExercises />
+            {history.map((workout) => (
+
+              <div
+                key={workout.id}
+                className="bg-card border border-border rounded-xl p-6"
+              >
+
+                <h2 className="text-2xl font-semibold">
+
+                  {workout.routines?.name}
+
+                </h2>
+
+                <p className="text-gray-400 mt-2">
+
+                  🔥 {workout.calories} Calories
+
+                </p>
+
+                <p className="text-gray-400">
+
+                  ⏱ {workout.duration} Seconds
+
+                </p>
+
+                <p className="text-gray-500 mt-2">
+
+                  {new Date(workout.completed_at).toLocaleString()}
+
+                </p>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
 
       </div>
 
-      <WorkoutNotes />
+    </div>
 
-      <MonthlyStatistics />
+  );
 
-    </main>
-
-  </div>
-);
 }

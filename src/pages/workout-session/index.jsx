@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
 import WorkoutHeader from "./components/WorkoutHeader";
@@ -9,88 +9,89 @@ import WorkoutControls from "./components/WorkoutControls";
 import ExerciseQueue from "./components/ExerciseQueue";
 import WorkoutComplete from "./components/WorkoutComplete";
 
+import { getRoutineExercises } from "../../services/routineExerciseService";
+import { saveWorkout } from "../../services/workoutHistoryService";
+
 export default function WorkoutSession() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [loading, setLoading] = useState(true);
+  const [exercises, setExercises] = useState([]);
 
   const [isCompleted, setIsCompleted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const user = {
-    name: "Alex Chen",
-    streak: 12,
-  };
-
-  const exercises = [
-    {
-      id: 1,
-      name: "Jumping Jacks",
-      duration: 30,
-      reps: 20,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
-    },
-    {
-      id: 2,
-      name: "Push Ups",
-      duration: 45,
-      reps: 15,
-      image:
-        "https://images.unsplash.com/photo-1598971639058-a81f6f64e2f3?w=1200",
-    },
-    {
-      id: 3,
-      name: "Squats",
-      duration: 40,
-      reps: 20,
-      image:
-        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200",
-    },
-    {
-      id: 4,
-      name: "Plank",
-      duration: 60,
-      reps: 1,
-      image:
-        "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200",
-    },
-    {
-      id: 5,
-      name: "Mountain Climbers",
-      duration: 45,
-      reps: 25,
-      image:
-        "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200",
-    },
-  ];
-
-  const currentExercise = exercises[currentIndex];
-
-  const [timeLeft, setTimeLeft] = useState(currentExercise.duration);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [isPaused, setIsPaused] = useState(false);
 
   const [calories, setCalories] = useState(0);
   const [heartRate, setHeartRate] = useState(95);
   const [repsCompleted, setRepsCompleted] = useState(0);
 
+  const user = {
+    name: "Alex Chen",
+    streak: 12,
+  };
+
   useEffect(() => {
+    loadExercises();
+  }, []);
+
+  async function loadExercises() {
+    try {
+      const data = await getRoutineExercises(id);
+
+      const formatted = (data || []).map((item) => ({
+        id: item.exercises.id,
+        name: item.exercises.name,
+        duration: 30,
+        reps: item.reps || 10,
+        image:
+          item.exercises.image_url ||
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
+      }));
+
+      setExercises(formatted);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const currentExercise = exercises[currentIndex] || {
+    duration: 30,
+    reps: 10,
+    name: "",
+    image: "",
+  };
+
+  useEffect(() => {
+    if (!currentExercise) return;
+
     setTimeLeft(currentExercise.duration);
     setIsPaused(false);
     setRepsCompleted(0);
-  }, [currentIndex]);
+  }, [currentExercise]);
 
-  const nextExercise = () => {
+  const nextExercise = async () => {
     setIsPaused(false);
 
     if (currentIndex < exercises.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      setIsCompleted(true);
-    }
-  };
+      try {
+        await saveWorkout({
+          routineId: id,
+          calories,
+          duration: exercises.length * 30,
+        });
+      } catch (err) {
+        console.error(err);
+      }
 
-  const previousExercise = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
+      setIsCompleted(true);
     }
   };
 
@@ -98,8 +99,8 @@ export default function WorkoutSession() {
     nextExercise();
   };
 
-  // Countdown Timer
   useEffect(() => {
+    if (loading) return;
     if (isPaused || isCompleted) return;
 
     if (timeLeft <= 0) {
@@ -112,10 +113,10 @@ export default function WorkoutSession() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [timeLeft, isPaused, isCompleted]);
+  }, [timeLeft, isPaused, isCompleted, loading]);
 
-  // Live Workout Metrics
   useEffect(() => {
+    if (loading) return;
     if (isPaused || isCompleted) return;
 
     const metrics = setInterval(() => {
@@ -123,9 +124,7 @@ export default function WorkoutSession() {
 
       setHeartRate((prev) => {
         const random = Math.floor(Math.random() * 5) - 2;
-        const value = prev + random;
-
-        return Math.max(90, Math.min(150, value));
+        return Math.max(90, Math.min(150, prev + random));
       });
 
       setRepsCompleted((prev) => {
@@ -134,18 +133,32 @@ export default function WorkoutSession() {
         }
         return prev;
       });
-
     }, 1000);
 
     return () => clearInterval(metrics);
+  }, [currentExercise, isPaused, isCompleted, loading]);
 
-  }, [currentIndex, isPaused, isCompleted, currentExercise.reps]);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl">
+        Loading...
+      </div>
+    );
+  }
+
+  if (exercises.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl">
+        No exercises in this routine.
+      </div>
+    );
+  }
 
   if (isCompleted) {
     return (
       <WorkoutComplete
         calories={calories}
-        duration="24 min"
+        duration={`${exercises.length * 30} sec`}
         xp={350}
         onBack={() => navigate("/dashboard-home")}
       />
@@ -154,13 +167,9 @@ export default function WorkoutSession() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        user={user}
-        onNavigate={(path) => navigate(path)}
-      />
+      <Header user={user} onNavigate={(path) => navigate(path)} />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-
         <WorkoutHeader
           current={currentIndex + 1}
           total={exercises.length}
@@ -168,11 +177,7 @@ export default function WorkoutSession() {
         />
 
         <div className="grid lg:grid-cols-3 gap-8 mt-8">
-
-          {/* LEFT */}
-
           <div className="lg:col-span-2 space-y-8">
-
             <WorkoutVideo exercise={currentExercise} />
 
             <WorkoutStats
@@ -188,13 +193,9 @@ export default function WorkoutSession() {
               onSkip={skipExercise}
               onFinish={nextExercise}
             />
-
           </div>
 
-          {/* RIGHT */}
-
           <div>
-
             <ExerciseQueue
               exercises={exercises.map((exercise, index) => ({
                 ...exercise,
@@ -203,11 +204,8 @@ export default function WorkoutSession() {
               }))}
               currentIndex={currentIndex}
             />
-
           </div>
-
         </div>
-
       </main>
     </div>
   );
