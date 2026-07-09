@@ -16,6 +16,8 @@ import Achievements from "../pages/achievements";
 import Notifications from "../pages/notifications";
 import Settings from "../pages/settings";
 import ProfileSetup from "../pages/profile-setup";
+import WorkoutRoutines from "../pages/workout-routines";
+import RoutineDetails from "../pages/routine-details";
 
 function PublicRoute() {
   const { user, loading } = useAuth();
@@ -154,6 +156,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <ProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workout-routines"
+          element={
+            <ProtectedRoute>
+              <WorkoutRoutines />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/routine/:id"
+          element={
+            <ProtectedRoute>
+              <RoutineDetails />
             </ProtectedRoute>
           }
         />

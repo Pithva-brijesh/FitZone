@@ -71,6 +71,11 @@ export default function Header({
       label: "Settings",
       path: "/settings",
       icon: "Settings",
+    },
+    {
+      label: "Routines",
+      path: "/workout-routines",
+      icon: "ClipboardList",
     }
   ];
 
