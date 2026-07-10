@@ -11,6 +11,7 @@ import WorkoutComplete from "./components/WorkoutComplete";
 
 import { getRoutineExercises } from "../../services/routineExerciseService";
 import { saveWorkout } from "../../services/workoutHistoryService";
+import { checkAchievements } from "../../services/achievementChecker";
 
 export default function WorkoutSession() {
   const navigate = useNavigate();
@@ -82,13 +83,20 @@ export default function WorkoutSession() {
       setCurrentIndex((prev) => prev + 1);
     } else {
       try {
+        console.log("Saving workout...");
+
         await saveWorkout({
           routineId: id,
           calories,
           duration: exercises.length * 30,
         });
+
+        await checkAchievements();
+
+        console.log("✅ Workout saved successfully");
       } catch (err) {
-        console.error(err);
+        console.error("❌ SAVE ERROR:", err);
+        alert(err.message);
       }
 
       setIsCompleted(true);

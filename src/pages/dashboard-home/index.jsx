@@ -12,6 +12,7 @@ import RecentAchievements from "./components/RecentAchievements";
 import UpcomingChallenges from "./components/UpcomingChallenges";
 import QuickActions from "./components/QuickActions";
 import PersonalBadges from "./components/PersonalBadges";
+import { getDashboardStats } from "../../services/dashboardService";
 
 const quote = {
   text: "Stay strong!",
@@ -92,12 +93,16 @@ export default function DashboardHome() {
   const { loading } = useAuth();
 
   const [profile, setProfile] = useState(null);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     async function loadProfile() {
       try {
         const data = await getProfile();
         setProfile(data);
+
+        const dashboardStats = await getDashboardStats();
+        setStats(dashboardStats);
       } catch (err) {
         console.error(err);
       }
@@ -106,7 +111,7 @@ export default function DashboardHome() {
     loadProfile();
   }, []);
 
-  if (loading || !profile) {
+  if (loading || !profile || !stats) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
@@ -115,13 +120,13 @@ export default function DashboardHome() {
   }
 
   const quickStats = {
-    weeklyWorkouts: 0,
+    weeklyWorkouts: stats.totalWorkouts,
     weeklyTarget: 5,
 
-    totalMinutes: 0,
+    totalMinutes: stats.totalMinutes,
     minutesTarget: 300,
 
-    caloriesBurned: profile.calories ?? 0,
+    caloriesBurned: stats.totalCalories,
     caloriesTarget: 2000,
 
     level: profile.level ?? 1,

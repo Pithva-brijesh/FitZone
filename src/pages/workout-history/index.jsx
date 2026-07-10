@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { getWorkoutHistory } from "../../services/workoutHistoryService";
+import { useEffect, useMemo, useState } from "react";
 import Header from "../../components/ui/Header";
+import { getWorkoutHistory } from "../../services/workoutHistoryService";
 
 export default function WorkoutHistory() {
-
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,87 +11,153 @@ export default function WorkoutHistory() {
   }, []);
 
   async function loadHistory() {
-
     try {
-
       const data = await getWorkoutHistory();
-
-      setHistory(data);
-
+      setHistory(data || []);
     } catch (err) {
-
       console.error(err);
-
     } finally {
-
       setLoading(false);
-
     }
-
   }
 
-  if (loading) {
+  const stats = useMemo(() => {
+    return {
+      workouts: history.length,
+      calories: history.reduce(
+        (sum, workout) => sum + (workout.calories || 0),
+        0
+      ),
+      duration: history.reduce(
+        (sum, workout) => sum + (workout.duration || 0),
+        0
+      ),
+    };
+  }, [history]);
 
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center text-2xl">
+        Loading Workout History...
       </div>
     );
-
   }
 
   return (
-
     <div className="min-h-screen bg-background">
 
       <Header />
 
-      <div className="max-w-6xl mx-auto py-12 px-6">
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-        <h1 className="text-4xl font-bold mb-8">
-          Workout History
-        </h1>
+        {/* Page Header */}
+
+        <div className="mb-10">
+
+          <h1 className="text-4xl font-bold text-white">
+            Workout History
+          </h1>
+
+          <p className="text-gray-400 mt-2">
+            Review all your completed workout sessions.
+          </p>
+
+        </div>
+
+        {/* Summary Cards */}
+
+        <div className="grid md:grid-cols-3 gap-6 mb-10">
+
+          <div className="bg-card border border-border rounded-xl p-6">
+            <p className="text-gray-400 text-sm">
+              Total Workouts
+            </p>
+
+            <h2 className="text-4xl font-bold mt-2">
+              {stats.workouts}
+            </h2>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6">
+            <p className="text-gray-400 text-sm">
+              Total Calories
+            </p>
+
+            <h2 className="text-4xl font-bold mt-2">
+              🔥 {stats.calories}
+            </h2>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6">
+            <p className="text-gray-400 text-sm">
+              Total Duration
+            </p>
+
+            <h2 className="text-4xl font-bold mt-2">
+              ⏱ {stats.duration}s
+            </h2>
+          </div>
+
+        </div>
+
+        {/* History */}
 
         {history.length === 0 ? (
 
-          <div className="text-gray-400">
-            No workouts completed yet.
+          <div className="bg-card border border-border rounded-xl p-12 text-center">
+
+            <h2 className="text-2xl font-bold">
+              No Workouts Yet 💪
+            </h2>
+
+            <p className="text-gray-400 mt-3">
+              Complete your first workout to start building your history.
+            </p>
+
           </div>
 
         ) : (
 
-          <div className="space-y-5">
+          <div className="space-y-6">
 
             {history.map((workout) => (
 
               <div
                 key={workout.id}
-                className="bg-card border border-border rounded-xl p-6"
+                className="bg-card border border-border rounded-xl p-6 hover:border-primary transition-all"
               >
 
-                <h2 className="text-2xl font-semibold">
+                <div className="flex justify-between items-start">
 
-                  {workout.routines?.name}
+                  <div>
 
-                </h2>
+                    <h2 className="text-2xl font-bold">
 
-                <p className="text-gray-400 mt-2">
+                      {workout.routines?.name || "Workout"}
 
-                  🔥 {workout.calories} Calories
+                    </h2>
 
-                </p>
+                    <p className="text-gray-400 mt-2">
 
-                <p className="text-gray-400">
+                      {new Date(workout.completed_at).toLocaleString()}
 
-                  ⏱ {workout.duration} Seconds
+                    </p>
 
-                </p>
+                  </div>
 
-                <p className="text-gray-500 mt-2">
+                  <div className="text-right">
 
-                  {new Date(workout.completed_at).toLocaleString()}
+                    <div className="text-orange-400 font-semibold">
+                      🔥 {workout.calories} Calories
+                    </div>
 
-                </p>
+                    <div className="text-blue-400 mt-2">
+                      ⏱ {workout.duration} Seconds
+                    </div>
+
+                  </div>
+
+                </div>
 
               </div>
 
@@ -105,7 +170,5 @@ export default function WorkoutHistory() {
       </div>
 
     </div>
-
   );
-
 }

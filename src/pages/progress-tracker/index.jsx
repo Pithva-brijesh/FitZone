@@ -11,6 +11,7 @@ import SkillTree from "./components/SkillTree";
 import MotivationTracker from "./components/MotivationTracker";
 import AchievementBadges from "./components/AchievementBadges";
 import ExportProgress from "./components/ExportProgress";
+import ExportProgress from "./components/ExportProgress";
 
 export default function ProgressTracker() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export default function ProgressTracker() {
   const [activeTab, setActiveTab] = useState("overview");
   const [viewMode, setViewMode] = useState("monthly");
   const [isLoading, setIsLoading] = useState(true);
+
+  const [progress, setProgress] = useState(null);
 
   const mockUser = {
     name: "Alex Chen",
@@ -106,14 +109,11 @@ export default function ProgressTracker() {
     { date: "Oct 13", value: 72 },
   ];
 
-  const workoutFrequency = [
-    { date: "Week 1", value: 3 },
-    { date: "Week 2", value: 4 },
-    { date: "Week 3", value: 5 },
-    { date: "Week 4", value: 4 },
-    { date: "Week 5", value: 6 },
-    { date: "Week 6", value: 5 },
-  ];
+  const workoutFrequency =
+  progress?.workouts?.map((workout, index) => ({
+    date: `Workout ${index + 1}`,
+    value: workout.calories,
+  })) || [];
 
   const skillsData = [
     {
@@ -223,9 +223,30 @@ export default function ProgressTracker() {
   ];
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+
+  async function load() {
+
+    try {
+
+      const data = await getProgressData();
+
+      setProgress(data);
+
+    } catch (err) {
+
+      console.error(err);
+
+    } finally {
+
+      setIsLoading(false);
+
+    }
+
+  }
+
+  load();
+
+}, []);
 
   const handleExport = (data) => {
     console.log(data);
