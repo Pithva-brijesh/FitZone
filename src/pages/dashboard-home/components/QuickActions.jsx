@@ -37,7 +37,7 @@ const QuickActions = ({ user, onQuickStart }) => {
       description: 'Connect with others',
       icon: 'Users',
       color: 'bg-accent text-accent-foreground',
-      action: () => navigate('/community')
+      action: () => navigate('/workout-routines')
     }
   ];
 

@@ -4,6 +4,7 @@ import Header from "../../components/ui/Header";
 import useAuth from "../../hooks/useAuth";
 
 import { getProfile } from "../../services/profileService";
+import { getDashboardStats } from "../../services/dashboardService";
 
 import PersonalizedGreeting from "./components/PersonalizedGreeting";
 import QuickStatsCard from "./components/QuickStatsCard";
@@ -12,7 +13,6 @@ import RecentAchievements from "./components/RecentAchievements";
 import UpcomingChallenges from "./components/UpcomingChallenges";
 import QuickActions from "./components/QuickActions";
 import PersonalBadges from "./components/PersonalBadges";
-import { getDashboardStats } from "../../services/dashboardService";
 
 const quote = {
   text: "Stay strong!",
@@ -96,24 +96,26 @@ export default function DashboardHome() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    async function loadProfile() {
+    async function loadDashboard() {
       try {
-        const data = await getProfile();
-        setProfile(data);
+        const [profileData, dashboardStats] = await Promise.all([
+          getProfile(),
+          getDashboardStats(),
+        ]);
 
-        const dashboardStats = await getDashboardStats();
+        setProfile(profileData);
         setStats(dashboardStats);
       } catch (err) {
         console.error(err);
       }
     }
 
-    loadProfile();
+    loadDashboard();
   }, []);
 
   if (loading || !profile || !stats) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center text-2xl">
         Loading...
       </div>
     );

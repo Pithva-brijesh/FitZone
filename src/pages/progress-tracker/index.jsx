@@ -11,7 +11,6 @@ import SkillTree from "./components/SkillTree";
 import MotivationTracker from "./components/MotivationTracker";
 import AchievementBadges from "./components/AchievementBadges";
 import ExportProgress from "./components/ExportProgress";
-import ExportProgress from "./components/ExportProgress";
 
 export default function ProgressTracker() {
   const navigate = useNavigate();
@@ -110,10 +109,10 @@ export default function ProgressTracker() {
   ];
 
   const workoutFrequency =
-  progress?.workouts?.map((workout, index) => ({
-    date: `Workout ${index + 1}`,
-    value: workout.calories,
-  })) || [];
+    progress?.workouts?.map((workout, index) => ({
+      date: `Workout ${index + 1}`,
+      value: workout.calories,
+    })) || [];
 
   const skillsData = [
     {
@@ -224,29 +223,29 @@ export default function ProgressTracker() {
 
   useEffect(() => {
 
-  async function load() {
+    async function load() {
 
-    try {
+      try {
 
-      const data = await getProgressData();
+        const data = await getProgressData();
 
-      setProgress(data);
+        setProgress(data);
 
-    } catch (err) {
+      } catch (err) {
 
-      console.error(err);
+        console.error(err);
 
-    } finally {
+      } finally {
 
-      setIsLoading(false);
+        setIsLoading(false);
+
+      }
 
     }
 
-  }
+    load();
 
-  load();
-
-}, []);
+  }, []);
 
   const handleExport = (data) => {
     console.log(data);
@@ -294,11 +293,10 @@ export default function ProgressTracker() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-lg ${
-                activeTab === tab.id
+              className={`px-4 py-2 rounded-lg ${activeTab === tab.id
                   ? "bg-primary text-white"
                   : "bg-muted text-muted-foreground"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2">
                 <Icon name={tab.icon} size={16} />
