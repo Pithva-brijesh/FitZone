@@ -54,9 +54,12 @@ const QuickStatsCard = ({ stats }) => {
         </h2>
         <Icon name="BarChart3" size={20} className="text-muted-foreground" />
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
         {statItems?.map((item) => (
-          <div key={item?.key} className="space-y-3">
+          <div
+  key={item?.key}
+  className="space-y-4 p-2 rounded-xl hover:bg-background/30 transition"
+>
             <div className="flex items-center justify-between">
               <div className={`w-10 h-10 rounded-lg ${item?.bgColor} flex items-center justify-center`}>
                 <Icon name={item?.icon} size={20} className={item?.color} />

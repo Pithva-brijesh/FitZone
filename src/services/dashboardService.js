@@ -14,6 +14,12 @@ export async function getDashboardStats() {
     .select("*")
     .eq("user_id", user.id);
 
+  const { data: achievements } = await supabase
+    .from("achievements")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
   const totalCalories = (workouts || []).reduce(
     (sum, w) => sum + (w.calories || 0),
     0
@@ -31,5 +37,6 @@ export async function getDashboardStats() {
     totalCalories,
     totalMinutes,
     totalRoutines: routines?.length || 0,
+    achievements: achievements || [],
   };
 }

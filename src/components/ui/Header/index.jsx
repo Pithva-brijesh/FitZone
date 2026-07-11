@@ -12,7 +12,7 @@ import Button from "../Button";
 export default function Header({
   user = null,
   notifications = {},
-  onNavigate = () => { },
+  onNavigate = () => {},
 }) {
   const navigate = useNavigate();
 
@@ -55,6 +55,10 @@ export default function Header({
       icon: "TrendingUp",
       tooltip: "Progress",
     },
+
+    // Hidden from the top navbar.
+    // These pages can still be opened from the profile dropdown.
+    /*
     {
       label: "Profile",
       path: "/user-profile",
@@ -76,9 +80,9 @@ export default function Header({
       label: "Routines",
       path: "/workout-routines",
       icon: "ClipboardList",
-    }
+    },
+    */
   ];
-
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -89,19 +93,16 @@ export default function Header({
   return (
     <>
       <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-        <div className="max-w-7xl mx-auto h-16 px-6 flex items-center">
+        <div className="w-full max-w-screen-2xl mx-auto h-16 px-6 flex items-center">
 
-          {/* Logo */}
           <Logo />
 
-          {/* Desktop Navigation */}
           <Navigation
             items={navigationItems}
             notifications={notifications}
             onNavigate={handleNavigate}
           />
 
-          {/* Right Side */}
           <div className="ml-auto flex items-center gap-4">
 
             {!user ? (
@@ -115,7 +116,6 @@ export default function Header({
               <ProfileDropdown user={user} />
             )}
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
@@ -131,7 +131,6 @@ export default function Header({
         </div>
       </header>
 
-      {/* Mobile Navigation */}
       <MobileMenu
         open={mobileOpen}
         items={navigationItems}

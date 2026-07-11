@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
+import useAuth from "../../hooks/useAuth";
 
 import NutritionHeader from "./components/NutritionHeader";
 import DailyCalories from "./components/DailyCalories";
@@ -16,13 +17,9 @@ import AddMealModal from "./components/AddMealModal";
 export default function Nutrition() {
   const navigate = useNavigate();
 
-  const [showAddMeal, setShowAddMeal] = useState(false);
+  const { user } = useAuth();
 
-  const user = {
-    name: "Alex Chen",
-    email: "alex@fitzone.com",
-    streak: 12,
-  };
+  const [showAddMeal, setShowAddMeal] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">

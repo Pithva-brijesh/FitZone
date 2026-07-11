@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Header from "../../components/ui/Header";
+import useAuth from "../../hooks/useAuth";
 import { getWorkoutHistory } from "../../services/workoutHistoryService";
 
 export default function WorkoutHistory() {
+  const { user } = useAuth();
+
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +49,10 @@ export default function WorkoutHistory() {
   return (
     <div className="min-h-screen bg-background">
 
-      <Header />
+      <Header
+  user={user}
+  onNavigate={() => {}}
+/>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
 

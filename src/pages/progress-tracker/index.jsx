@@ -11,6 +11,8 @@ import SkillTree from "./components/SkillTree";
 import MotivationTracker from "./components/MotivationTracker";
 import AchievementBadges from "./components/AchievementBadges";
 import ExportProgress from "./components/ExportProgress";
+import { getProgressData } from "../../services/progressService";
+import useAuth from "../../hooks/useAuth";
 
 export default function ProgressTracker() {
   const navigate = useNavigate();
@@ -21,17 +23,7 @@ export default function ProgressTracker() {
 
   const [progress, setProgress] = useState(null);
 
-  const mockUser = {
-    name: "Alex Chen",
-    email: "alex.chen@fitzone.com",
-    streak: 12,
-    role: "user",
-    stats: {
-      workouts: 45,
-      level: 8,
-      points: 2340,
-    },
-  };
+  const { user } = useAuth();
 
   const overviewData = [
     {
@@ -88,25 +80,17 @@ export default function ProgressTracker() {
     },
   ];
 
-  const strengthData = [
-    { date: "Oct 1", value: 65 },
-    { date: "Oct 3", value: 68 },
-    { date: "Oct 5", value: 72 },
-    { date: "Oct 7", value: 75 },
-    { date: "Oct 9", value: 78 },
-    { date: "Oct 11", value: 82 },
-    { date: "Oct 13", value: 85 },
-  ];
+  const strengthData =
+    progress?.weights?.map((weight) => ({
+      date: new Date(weight.logged_at).toLocaleDateString(),
+      value: weight.weight,
+    })) || [];
 
-  const enduranceData = [
-    { date: "Oct 1", value: 45 },
-    { date: "Oct 3", value: 52 },
-    { date: "Oct 5", value: 58 },
-    { date: "Oct 7", value: 63 },
-    { date: "Oct 9", value: 67 },
-    { date: "Oct 11", value: 70 },
-    { date: "Oct 13", value: 72 },
-  ];
+  const enduranceData =
+    progress?.workouts?.map((workout, index) => ({
+      date: `Workout ${index + 1}`,
+      value: workout.duration / 60,
+    })) || [];
 
   const workoutFrequency =
     progress?.workouts?.map((workout, index) => ({
@@ -255,9 +239,9 @@ export default function ProgressTracker() {
     return (
       <div className="min-h-screen bg-background">
         <Header
-          user={mockUser}
-          onNavigate={(path) => navigate(path)}
-        />
+  user={user}
+  onNavigate={(path) => navigate(path)}
+/>
 
         <div className="flex justify-center items-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
@@ -269,9 +253,9 @@ export default function ProgressTracker() {
   return (
     <div className="min-h-screen bg-background">
       <Header
-        user={mockUser}
-        onNavigate={(path) => navigate(path)}
-      />
+  user={user}
+  onNavigate={(path) => navigate(path)}
+/>
 
       <main className="container mx-auto max-w-7xl px-6 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -294,8 +278,8 @@ export default function ProgressTracker() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-lg ${activeTab === tab.id
-                  ? "bg-primary text-white"
-                  : "bg-muted text-muted-foreground"
+                ? "bg-primary text-white"
+                : "bg-muted text-muted-foreground"
                 }`}
             >
               <div className="flex items-center gap-2">

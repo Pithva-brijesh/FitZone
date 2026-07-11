@@ -18,6 +18,26 @@ export async function getRoutines() {
   return data;
 }
 
+// NEW
+export async function getRoutine(id) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("User not logged in.");
+
+  const { data, error } = await supabase
+    .from("routines")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
+
 export async function createRoutine(name, description) {
   const {
     data: { user },

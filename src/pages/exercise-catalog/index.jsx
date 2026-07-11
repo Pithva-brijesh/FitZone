@@ -7,8 +7,11 @@ import FilterControls from "./components/FilterControls";
 import ExerciseGrid from "./components/ExerciseGrid";
 
 import { supabase } from "../../lib/supabase";
+import useAuth from "../../hooks/useAuth";
 
 export default function ExerciseCatalog() {
+  const { user } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
 
@@ -42,9 +45,7 @@ export default function ExerciseCatalog() {
 
   const filteredExercises = exercises.filter((exercise) => {
     const matchesSearch =
-      exercise.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
+      exercise.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       exercise.description
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -98,26 +99,17 @@ export default function ExerciseCatalog() {
 
   const exerciseCounts = {
     all: exercises.length,
-    strength: exercises.filter(
-      (e) => e.category === "strength"
-    ).length,
-    cardio: exercises.filter(
-      (e) => e.category === "cardio"
-    ).length,
-    flexibility: exercises.filter(
-      (e) => e.category === "flexibility"
-    ).length,
-    balance: exercises.filter(
-      (e) => e.category === "balance"
-    ).length,
+    strength: exercises.filter((e) => e.category === "strength").length,
+    cardio: exercises.filter((e) => e.category === "cardio").length,
+    flexibility: exercises.filter((e) => e.category === "flexibility").length,
+    balance: exercises.filter((e) => e.category === "balance").length,
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header user={user} />
 
       <main className="container mx-auto p-6 space-y-6">
-
         <QuickActions />
 
         <CategoryFilter
@@ -155,7 +147,6 @@ export default function ExerciseCatalog() {
           onAddToRoutine={() => {}}
           isLoading={loading}
         />
-
       </main>
     </div>
   );

@@ -33,16 +33,6 @@ const content = {
   author: "FitZone",
 };
 
-const recentAchievements = [
-  {
-    id: 1,
-    title: "12-Day Streak",
-    description: "Completed workouts for 12 consecutive days",
-    type: "streak",
-    points: 120,
-    earnedAt: new Date(),
-  },
-];
 
 const upcomingChallenges = [
   {
@@ -121,6 +111,8 @@ export default function DashboardHome() {
     );
   }
 
+  console.log(profile);
+
   const quickStats = {
     weeklyWorkouts: stats.totalWorkouts,
     weeklyTarget: 5,
@@ -138,7 +130,7 @@ export default function DashboardHome() {
     <div className="min-h-screen bg-background">
       <Header user={profile} />
 
-      <main className="container mx-auto p-6 space-y-6">
+      <main className="w-full max-w-screen-2xl mx-auto px-6 py-6 space-y-6">
         <PersonalizedGreeting
           user={profile}
           streak={profile.streak ?? 0}
@@ -153,7 +145,14 @@ export default function DashboardHome() {
         />
 
         <RecentAchievements
-          achievements={recentAchievements}
+          achievements={stats.achievements.map((a) => ({
+            id: a.id,
+            title: a.achievement_name,
+            description: "Achievement unlocked!",
+            type: "workout",
+            earnedAt: a.created_at,
+            points: 100,
+          }))}
         />
 
         <UpcomingChallenges

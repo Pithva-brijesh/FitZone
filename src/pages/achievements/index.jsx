@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
+import useAuth from "../../hooks/useAuth";
 
 import AchievementHeader from "./components/AchievementHeader";
 import XPCard from "./components/XPCard";
@@ -16,11 +17,7 @@ import AchievementTimeline from "./components/AchievementTimeline";
 export default function Achievements() {
   const navigate = useNavigate();
 
-  const user = {
-    name: "Alex Chen",
-    email: "alex@fitzone.com",
-    streak: 18,
-  };
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">

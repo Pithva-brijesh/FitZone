@@ -13,7 +13,7 @@ export async function checkAchievements() {
     );
 
     if (totalWorkouts >= 1)
-        await unlockAchievement("🏅 First Workout");
+        await unlockAchievement("FIRST_WORKOUT");
 
     if (totalWorkouts >= 5)
         await unlockAchievement("💪 Consistent");

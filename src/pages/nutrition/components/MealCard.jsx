@@ -12,16 +12,13 @@ export default function MealCard({
 }) {
   return (
     <div
-      className={`morphic-card rounded-2xl border p-6 transition-all duration-300 hover:scale-[1.02] ${
+      className={`morphic-card rounded-2xl border p-6 transition-all duration-300 ${
         completed
           ? "bg-card border-success/40"
           : "bg-card border-border"
       }`}
     >
-      {/* Header */}
-
       <div className="flex justify-between items-center mb-6">
-
         <div className="flex items-center gap-3">
 
           <div
@@ -43,7 +40,6 @@ export default function MealCard({
           </div>
 
           <div>
-
             <h3 className="font-bold text-lg text-foreground">
               {mealName}
             </h3>
@@ -51,7 +47,6 @@ export default function MealCard({
             <p className="text-sm text-muted-foreground">
               {calories} kcal
             </p>
-
           </div>
 
         </div>
@@ -63,63 +58,38 @@ export default function MealCard({
             className="text-success"
           />
         )}
-
       </div>
-
-      {/* Nutrition */}
 
       <div className="grid grid-cols-3 gap-4">
 
         <div className="bg-background rounded-xl p-3 text-center">
-
           <div className="font-bold text-success">
-
             {protein}g
-
           </div>
-
           <div className="text-xs text-muted-foreground">
-
             Protein
-
           </div>
-
         </div>
 
         <div className="bg-background rounded-xl p-3 text-center">
-
           <div className="font-bold text-warning">
-
             {carbs}g
-
           </div>
-
           <div className="text-xs text-muted-foreground">
-
             Carbs
-
           </div>
-
         </div>
 
         <div className="bg-background rounded-xl p-3 text-center">
-
           <div className="font-bold text-red-400">
-
             {fat}g
-
           </div>
-
           <div className="text-xs text-muted-foreground">
-
             Fat
-
           </div>
-
         </div>
 
       </div>
-
     </div>
   );
 }
