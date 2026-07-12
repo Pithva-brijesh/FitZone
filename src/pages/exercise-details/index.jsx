@@ -6,6 +6,7 @@ import Header from "../../components/ui/Header";
 import ExerciseVideoPlayer from "./components/ExerciseVideoPlayer";
 import ExerciseInformation from "./components/ExerciseInformation";
 import ExerciseActions from "./components/ExerciseActions";
+import useAuth from "../../hooks/useAuth";
 
 export default function ExerciseDetailsPage() {
   const navigate = useNavigate();
@@ -14,17 +15,7 @@ export default function ExerciseDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [exercise, setExercise] = useState(null);
 
-  const user = {
-    name: "Alex Johnson",
-    streak: 21,
-    role: "user",
-    stats: {
-      workouts: 45,
-      level: 12,
-      points: 2340,
-    },
-    unreadNotifications: 3,
-  };
+  const { user } = useAuth();
 
   useEffect(() => {
     async function loadExercise() {
@@ -52,8 +43,8 @@ export default function ExerciseDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-xl">
-        Loading...
+      <div className="animate-pulse text-2xl">
+        Loading Exercise...
       </div>
     );
   }
@@ -61,7 +52,7 @@ export default function ExerciseDetailsPage() {
   if (!exercise) {
     return (
       <div className="min-h-screen flex items-center justify-center text-xl">
-        Exercise not found.
+        The exercise may have been removed.
       </div>
     );
   }
@@ -81,9 +72,9 @@ export default function ExerciseDetailsPage() {
 
     instructions: exercise.instructions
       ? exercise.instructions
-          .split(".")
-          .map((step) => step.trim())
-          .filter(Boolean)
+        .split(".")
+        .map((step) => step.trim())
+        .filter(Boolean)
       : [],
 
     primaryMuscles: exercise.muscle_group

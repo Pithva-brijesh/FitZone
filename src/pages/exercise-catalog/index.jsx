@@ -1,3 +1,5 @@
+import { getRoutines } from "../../services/routineService";
+import { addExerciseToRoutine } from "../../services/routineExerciseService";
 import React, { useEffect, useState } from "react";
 
 import Header from "../../components/ui/Header";
@@ -14,6 +16,9 @@ export default function ExerciseCatalog() {
 
   const [loading, setLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
+  const [routines, setRoutines] = useState([]);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -25,6 +30,7 @@ export default function ExerciseCatalog() {
 
   useEffect(() => {
     loadExercises();
+    loadRoutines();
   }, []);
 
   async function loadExercises() {
@@ -41,6 +47,37 @@ export default function ExerciseCatalog() {
     }
 
     setLoading(false);
+  }
+  async function loadRoutines() {
+    try {
+      const data = await getRoutines();
+      setRoutines(data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  function handleStartExercise(exercise) {
+    setSelectedExercise(exercise);
+    setShowRoutineModal(true);
+  }
+
+  async function handleSelectRoutine(routine) {
+    try {
+      await addExerciseToRoutine(
+        routine.id,
+        selectedExercise.id
+      );
+
+      alert(
+        `${selectedExercise.name} added to ${routine.name}`
+      );
+
+      setShowRoutineModal(false);
+      setSelectedExercise(null);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
   }
 
   const filteredExercises = exercises.filter((exercise) => {
@@ -143,11 +180,58 @@ export default function ExerciseCatalog() {
         <ExerciseGrid
           exercises={filteredExercises}
           bookmarkedExercises={[]}
-          onBookmark={() => {}}
-          onAddToRoutine={() => {}}
+          onBookmark={() => { }}
+          onAddToRoutine={handleStartExercise}
           isLoading={loading}
         />
       </main>
+      {showRoutineModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-card rounded-2xl p-6 w-full max-w-md border border-border">
+
+            <h2 className="text-2xl font-bold mb-2">
+              Select Routine
+            </h2>
+
+            <p className="text-muted-foreground mb-6">
+              Choose where to add
+              <span className="font-semibold">
+                {" "}{selectedExercise?.name}
+              </span>
+            </p>
+
+            <div className="space-y-3">
+
+              {routines.map((routine) => (
+
+                <button
+                  key={routine.id}
+                  onClick={() => handleSelectRoutine(routine)}
+                  className="w-full text-left p-4 rounded-xl bg-background hover:bg-primary hover:text-white transition"
+                >
+                  <div className="font-semibold">
+                    {routine.name}
+                  </div>
+
+                  <div className="text-sm opacity-70">
+                    {routine.description}
+                  </div>
+                </button>
+
+              ))}
+
+            </div>
+
+            <button
+              onClick={() => setShowRoutineModal(false)}
+              className="mt-6 w-full py-3 rounded-xl bg-red-500 text-white"
+            >
+              Cancel
+            </button>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

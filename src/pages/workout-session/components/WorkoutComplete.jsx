@@ -12,57 +12,51 @@ export default function WorkoutComplete({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
 
-      <div className="max-w-3xl w-full morphic-card bg-card border border-border rounded-3xl p-10">
+      <div className="max-w-4xl w-full bg-card border border-border rounded-3xl p-10 shadow-2xl">
 
-        {/* Success Icon */}
+        {/* Success */}
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center">
 
-          <div className="w-32 h-32 rounded-full bg-success flex items-center justify-center shadow-lg">
+          <div className="w-36 h-36 rounded-full bg-success/10 border-4 border-success flex items-center justify-center animate-pulse">
 
             <Icon
-              name="Check"
-              size={70}
-              color="white"
+              name="CheckCircle2"
+              size={90}
+              className="text-success"
             />
 
           </div>
 
-        </div>
-
-        {/* Title */}
-
-        <div className="text-center mt-8">
-
-          <h1 className="text-5xl font-bold text-foreground">
+          <h1 className="text-5xl font-bold mt-8">
             Workout Complete!
           </h1>
 
-          <p className="text-muted-foreground text-lg mt-3">
-            Great job! You finished today's workout.
+          <p className="text-muted-foreground mt-3 text-lg">
+            Amazing work! You completed your workout.
           </p>
 
         </div>
 
-        {/* Statistics */}
+        {/* Summary */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+        <div className="grid md:grid-cols-4 gap-6 mt-12">
 
           <div className="bg-primary/10 rounded-2xl p-6 text-center">
 
             <Icon
               name="Flame"
               size={34}
-              className="text-warning mx-auto mb-3"
+              className="mx-auto text-orange-500 mb-3"
             />
 
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Calories
             </p>
 
-            <h2 className="text-3xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl font-bold mt-2">
               {calories}
             </h2>
 
@@ -73,33 +67,51 @@ export default function WorkoutComplete({
             <Icon
               name="Clock3"
               size={34}
-              className="text-success mx-auto mb-3"
+              className="mx-auto text-success mb-3"
             />
 
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Duration
             </p>
 
-            <h2 className="text-3xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl font-bold mt-2">
               {duration}
             </h2>
 
           </div>
 
-          <div className="bg-accent/10 rounded-2xl p-6 text-center">
+          <div className="bg-warning/10 rounded-2xl p-6 text-center">
 
             <Icon
               name="Award"
               size={34}
-              className="text-accent mx-auto mb-3"
+              className="mx-auto text-warning mb-3"
             />
 
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               XP Earned
             </p>
 
-            <h2 className="text-3xl font-bold text-foreground mt-2">
+            <h2 className="text-3xl font-bold mt-2">
               +{xp}
+            </h2>
+
+          </div>
+
+          <div className="bg-secondary/10 rounded-2xl p-6 text-center">
+
+            <Icon
+              name="Dumbbell"
+              size={34}
+              className="mx-auto text-secondary mb-3"
+            />
+
+            <p className="text-muted-foreground text-sm">
+              Status
+            </p>
+
+            <h2 className="text-2xl font-bold mt-2">
+              Finished
             </h2>
 
           </div>
@@ -108,25 +120,72 @@ export default function WorkoutComplete({
 
         {/* Achievement */}
 
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 p-6">
+        <div className="mt-10 rounded-3xl border border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-8">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
 
-            <Icon
-              name="Trophy"
-              size={42}
-              className="text-warning"
-            />
+            <div className="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center">
+
+              <Icon
+                name="Trophy"
+                size={34}
+                className="text-yellow-400"
+              />
+
+            </div>
 
             <div>
 
-              <h3 className="text-2xl font-bold text-foreground">
-                Achievement Unlocked!
-              </h3>
+              <h2 className="text-2xl font-bold">
+                Achievement Unlocked
+              </h2>
 
               <p className="text-muted-foreground mt-1">
-                Workout Warrior — Complete your daily workout.
+                🏅 Workout Warrior
               </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Motivation */}
+
+        <div className="mt-8 bg-background rounded-2xl p-6 border border-border">
+
+          <h3 className="font-bold text-xl mb-3">
+
+            Today's Progress
+
+          </h3>
+
+          <div className="space-y-4">
+
+            <div className="flex justify-between">
+
+              <span>Workout Completed</span>
+
+              <Icon
+                name="CheckCircle2"
+                className="text-success"
+              />
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>Calories Burned</span>
+
+              <span>{calories}</span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>XP Earned</span>
+
+              <span>+{xp}</span>
 
             </div>
 
@@ -136,26 +195,32 @@ export default function WorkoutComplete({
 
         {/* Buttons */}
 
-        <div className="grid md:grid-cols-2 gap-4 mt-10">
+        <div className="grid md:grid-cols-3 gap-4 mt-10">
 
           <Button
-            variant="default"
             iconName="House"
-            iconPosition="left"
             className="h-14"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard-home")}
           >
-            Back to Dashboard
+            Dashboard
+          </Button>
+
+          <Button
+            variant="outline"
+            iconName="History"
+            className="h-14"
+            onClick={() => navigate("/workout-history")}
+          >
+            History
           </Button>
 
           <Button
             variant="secondary"
             iconName="Share2"
-            iconPosition="left"
             className="h-14"
             onClick={() => alert("Sharing feature coming soon!")}
           >
-            Share Achievement
+            Share
           </Button>
 
         </div>

@@ -8,10 +8,16 @@ import WorkoutStats from "./components/WorkoutStats";
 import WorkoutControls from "./components/WorkoutControls";
 import ExerciseQueue from "./components/ExerciseQueue";
 import WorkoutComplete from "./components/WorkoutComplete";
+import { getRoutine } from "../../services/routineService";
+import ExerciseInfo from "./components/ExerciseInfo";
+
 
 import { getRoutineExercises } from "../../services/routineExerciseService";
-import { saveWorkout } from "../../services/workoutHistoryService";
-import { checkAchievements } from "../../services/achievementChecker";
+import {
+  finishWorkout,
+  calculateXP,
+} from "../../services/workoutService";
+import useAuth from "../../hooks/useAuth";
 
 export default function WorkoutSession() {
   const navigate = useNavigate();
@@ -25,19 +31,33 @@ export default function WorkoutSession() {
 
   const [timeLeft, setTimeLeft] = useState(30);
   const [isPaused, setIsPaused] = useState(false);
+  const [currentSet, setCurrentSet] = useState(1);
 
   const [calories, setCalories] = useState(0);
   const [heartRate, setHeartRate] = useState(95);
   const [repsCompleted, setRepsCompleted] = useState(0);
 
-  const user = {
-    name: "Alex Chen",
-    streak: 12,
-  };
+  const [routine, setRoutine] = useState(null);
+  const [isResting, setIsResting] = useState(false);
+  const [restTime, setRestTime] = useState(60);
+
+  const { user } = useAuth();
 
   useEffect(() => {
-    loadExercises();
-  }, []);
+    loadWorkout();
+  }, [id]);
+
+  async function loadWorkout() {
+    try {
+      const routineData = await getRoutine(id);
+
+      setRoutine(routineData);
+
+      await loadExercises();
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   async function loadExercises() {
     try {
@@ -45,14 +65,33 @@ export default function WorkoutSession() {
 
       const formatted = (data || []).map((item) => ({
         id: item.exercises.id,
+
         name: item.exercises.name,
+
+        description: item.exercises.description,
+
+        instructions: item.exercises.instructions,
+
+        difficulty: item.exercises.difficulty,
+
+        muscle_group: item.exercises.muscle_group,
+
+        equipment: item.exercises.equipment,
+
+        caloriesPerMinute: item.exercises.calories_per_min,
+
         duration: 30,
+
         reps: item.reps || 10,
+
+        sets: item.sets || 3,
+
+        rest: item.rest_time || 60,
+
         image:
           item.exercises.image_url ||
           "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
       }));
-
       setExercises(formatted);
     } catch (err) {
       console.error(err);
@@ -71,36 +110,53 @@ export default function WorkoutSession() {
   useEffect(() => {
     if (!currentExercise) return;
 
-    setTimeLeft(currentExercise.duration);
+    setTimeLeft(currentExercise.duration || 30);
     setIsPaused(false);
     setRepsCompleted(0);
-  }, [currentExercise]);
+    setCurrentSet(1);
+
+  }, [currentIndex]);
 
   const nextExercise = async () => {
     setIsPaused(false);
 
+    // Start rest after finishing current exercise
+    if (!isResting) {
+      setRestTime(currentExercise.rest || 60);
+      setIsResting(true);
+      return;
+    }
+
+    // Move to next exercise
+    setIsResting(false);
+    setRestTime(60);
+
+    if (currentSet < currentExercise.sets) {
+      setCurrentSet((prev) => prev + 1);
+      setTimeLeft(currentExercise.duration || 30);
+      setRepsCompleted(0);
+      return;
+    }
+
     if (currentIndex < exercises.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-    } else {
-      try {
-        console.log("Saving workout...");
-
-        await saveWorkout({
-          routineId: id,
-          calories,
-          duration: exercises.length * 30,
-        });
-
-        await checkAchievements();
-
-        console.log("✅ Workout saved successfully");
-      } catch (err) {
-        console.error("❌ SAVE ERROR:", err);
-        alert(err.message);
-      }
-
-      setIsCompleted(true);
+      return;
     }
+
+    try {
+      const result = await finishWorkout({
+        routineId: id,
+        exercises,
+        calories,
+      });
+
+      console.log("Workout Finished", result);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+
+    setIsCompleted(true);
   };
 
   const skipExercise = () => {
@@ -109,7 +165,9 @@ export default function WorkoutSession() {
 
   useEffect(() => {
     if (loading) return;
-    if (isPaused || isCompleted) return;
+    if (isPaused) return;
+    if (isCompleted) return;
+    if (isResting) return;
 
     if (timeLeft <= 0) {
       nextExercise();
@@ -121,11 +179,34 @@ export default function WorkoutSession() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [timeLeft, isPaused, isCompleted, loading]);
+  }, [
+    timeLeft,
+    isPaused,
+    isCompleted,
+    isResting,
+    loading,
+  ]);
+
+  useEffect(() => {
+    if (!isResting) return;
+
+    if (restTime <= 0) {
+      nextExercise();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setRestTime((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [restTime, isResting]);
+
+
 
   useEffect(() => {
     if (loading) return;
-    if (isPaused || isCompleted) return;
+    if (isPaused || isCompleted || isResting) return;
 
     const metrics = setInterval(() => {
       setCalories((prev) => prev + 1);
@@ -144,7 +225,13 @@ export default function WorkoutSession() {
     }, 1000);
 
     return () => clearInterval(metrics);
-  }, [currentExercise, isPaused, isCompleted, loading]);
+  }, [
+    currentExercise,
+    isPaused,
+    isCompleted,
+    isResting,
+    loading,
+  ]);
 
   if (loading) {
     return (
@@ -162,12 +249,109 @@ export default function WorkoutSession() {
     );
   }
 
+  if (isResting) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header user={user} />
+
+        <main className="max-w-3xl mx-auto py-20 px-6">
+
+          <div className="bg-card rounded-3xl border border-border p-10 text-center">
+
+            <h1 className="text-5xl font-bold mb-4">
+              💪 Rest Time
+            </h1>
+
+            <p className="text-muted-foreground text-lg mb-8">
+              Recover before your next exercise
+            </p>
+
+            <div className="text-8xl font-bold text-primary mb-10">
+              {restTime}
+            </div>
+
+            <div className="bg-background rounded-2xl p-8 mb-8 border border-border">
+
+              <p className="text-primary font-semibold mb-4">
+                NEXT EXERCISE
+              </p>
+
+              {exercises[currentIndex + 1] ? (
+
+                <>
+
+                  <img
+                    src={exercises[currentIndex + 1].image}
+                    alt={exercises[currentIndex + 1].name}
+                    className="w-full h-52 object-cover rounded-xl mb-6"
+                  />
+
+                  <h2 className="text-3xl font-bold mb-4">
+                    {exercises[currentIndex + 1].name}
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-4">
+
+                    <div className="bg-card rounded-xl p-4">
+
+                      <p className="text-sm text-muted-foreground">
+                        Muscle
+                      </p>
+
+                      <p className="font-semibold">
+                        {exercises[currentIndex + 1].muscle_group}
+                      </p>
+
+                    </div>
+
+                    <div className="bg-card rounded-xl p-4">
+
+                      <p className="text-sm text-muted-foreground">
+                        Sets × Reps
+                      </p>
+
+                      <p className="font-semibold">
+                        {exercises[currentIndex + 1].sets} × {exercises[currentIndex + 1].reps}
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </>
+
+              ) : (
+
+                <h2 className="text-3xl font-bold">
+                  Workout Complete 🎉
+                </h2>
+
+              )}
+
+            </div>
+
+            <button
+              onClick={() => {
+                setRestTime(0);
+              }}
+              className="px-8 py-4 rounded-xl bg-primary text-white hover:scale-105 transition"
+            >
+              Skip Rest
+            </button>
+
+          </div>
+
+        </main>
+      </div>
+    );
+  }
+
   if (isCompleted) {
     return (
       <WorkoutComplete
         calories={calories}
         duration={`${exercises.length * 30} sec`}
-        xp={350}
+        xp={calculateXP(exercises)}
         onBack={() => navigate("/dashboard-home")}
       />
     );
@@ -179,20 +363,24 @@ export default function WorkoutSession() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <WorkoutHeader
+          routine={routine}
           current={currentIndex + 1}
           total={exercises.length}
+          currentSet={currentSet}
           exercise={currentExercise}
         />
-
         <div className="grid lg:grid-cols-3 gap-8 mt-8">
           <div className="lg:col-span-2 space-y-8">
+            <ExerciseInfo exercise={currentExercise} />
+
             <WorkoutVideo exercise={currentExercise} />
 
             <WorkoutStats
-              timer={`00:${String(timeLeft).padStart(2, "0")}`}
               reps={`${repsCompleted} / ${currentExercise.reps}`}
               calories={calories}
               heartRate={heartRate}
+              timeLeft={timeLeft}
+              totalTime={currentExercise.duration}
             />
 
             <WorkoutControls

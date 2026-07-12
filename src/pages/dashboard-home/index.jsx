@@ -10,74 +10,15 @@ import PersonalizedGreeting from "./components/PersonalizedGreeting";
 import QuickStatsCard from "./components/QuickStatsCard";
 import TrendingContentCard from "./components/TrendingContentCard";
 import RecentAchievements from "./components/RecentAchievements";
-import UpcomingChallenges from "./components/UpcomingChallenges";
 import QuickActions from "./components/QuickActions";
-import PersonalBadges from "./components/PersonalBadges";
+import LatestWorkoutCard from "./components/LatestWorkoutCard";
+import NutritionSummaryCard from "./components/NutritionSummaryCard";
+import WeeklyActivityChart from "./components/WeeklyActivityChart";
 
 const quote = {
   text: "Stay strong!",
   author: "FitZone",
 };
-
-const content = {
-  id: 1,
-  type: "exercise",
-  title: "HIIT Workout",
-  description: "20-minute fat-burning HIIT session",
-  image:
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600",
-  imageAlt: "Workout",
-  likes: 1200,
-  views: 5500,
-  difficulty: 2,
-  author: "FitZone",
-};
-
-
-const upcomingChallenges = [
-  {
-    id: 1,
-    title: "30-Day Plank Challenge",
-    description: "Build core strength with daily planks.",
-    currentProgress: 15,
-    target: 30,
-    unit: "days",
-    difficulty: "intermediate",
-    endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-    participants: 2500,
-    reward: "500 pts",
-  },
-];
-
-const personalBadges = [
-  {
-    id: 1,
-    name: "Streak Master",
-    description: "10+ day streak",
-    category: "streak",
-    rarity: "rare",
-  },
-  {
-    id: 2,
-    name: "HIIT Champion",
-    description: "Completed 25 HIIT workouts",
-    category: "fitness",
-    rarity: "epic",
-  },
-];
-
-const currentGoals = [
-  {
-    id: 1,
-    title: "Lose Weight",
-    description: "Target by next month",
-    type: "weight",
-    current: 6,
-    target: 10,
-    unit: "kg",
-    deadline: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-  },
-];
 
 export default function DashboardHome() {
   const { loading } = useAuth();
@@ -111,8 +52,6 @@ export default function DashboardHome() {
     );
   }
 
-  console.log(profile);
-
   const quickStats = {
     weeklyWorkouts: stats.totalWorkouts,
     weeklyTarget: 5,
@@ -130,44 +69,62 @@ export default function DashboardHome() {
     <div className="min-h-screen bg-background">
       <Header user={profile} />
 
-      <main className="w-full max-w-screen-2xl mx-auto px-6 py-6 space-y-6">
+      <main className="max-w-screen-2xl mx-auto px-6 py-6 space-y-6">
+
+        {/* Greeting */}
         <PersonalizedGreeting
           user={profile}
           streak={profile.streak ?? 0}
           motivationalQuote={quote}
         />
 
+        {/* Stats */}
         <QuickStatsCard stats={quickStats} />
 
-        <TrendingContentCard
-          content={content}
-          type="exercise"
+        {/* Continue Workout + Latest Workout */}
+        <div className="grid lg:grid-cols-2 gap-6">
+
+          <TrendingContentCard
+            routine={stats.activeRoutine}
+          />
+
+          <LatestWorkoutCard
+            workout={stats.latestWorkout}
+          />
+
+        </div>
+
+        {/* Achievements + Nutrition */}
+        <div className="grid lg:grid-cols-2 gap-6">
+
+          <RecentAchievements
+            achievements={stats.achievements.map((a) => ({
+              id: a.id,
+              title: a.achievement_name,
+              description: "Achievement unlocked!",
+              type: "workout",
+              earnedAt: a.unlocked_at,
+              points: 100,
+            }))}
+          />
+
+          <NutritionSummaryCard
+            stats={stats}
+          />
+
+        </div>
+
+        {/* Weekly Activity */}
+        <WeeklyActivityChart
+          data={stats.weeklyActivity}
         />
 
-        <RecentAchievements
-          achievements={stats.achievements.map((a) => ({
-            id: a.id,
-            title: a.achievement_name,
-            description: "Achievement unlocked!",
-            type: "workout",
-            earnedAt: a.created_at,
-            points: 100,
-          }))}
-        />
-
-        <UpcomingChallenges
-          challenges={upcomingChallenges}
-        />
-
+        {/* Quick Actions */}
         <QuickActions
           user={profile}
           onQuickStart={() => alert("Workout Started")}
         />
 
-        <PersonalBadges
-          badges={personalBadges}
-          currentGoals={currentGoals}
-        />
       </main>
     </div>
   );

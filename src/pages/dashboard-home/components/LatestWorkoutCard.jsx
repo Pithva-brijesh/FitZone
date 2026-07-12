@@ -4,34 +4,32 @@ import { useNavigate } from "react-router-dom";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 
-export default function TrendingContentCard({
-  routine,
-}) {
+export default function LatestWorkoutCard({ workout }) {
   const navigate = useNavigate();
 
-  if (!routine) {
+  if (!workout) {
     return (
       <div className="bg-card rounded-2xl border border-border p-8 text-center">
 
         <Icon
-          name="Dumbbell"
-          size={50}
+          name="History"
+          size={48}
           className="mx-auto text-primary mb-4"
         />
 
         <h2 className="text-2xl font-bold">
-          No Workout Routine
+          No Workout Yet
         </h2>
 
         <p className="text-muted-foreground mt-2">
-          Create your first routine to start training.
+          Complete your first workout to build your history.
         </p>
 
         <Button
           className="mt-6"
           onClick={() => navigate("/workout-routines")}
         >
-          Create Routine
+          Start Training
         </Button>
 
       </div>
@@ -46,41 +44,37 @@ export default function TrendingContentCard({
         <div>
 
           <p className="text-primary font-semibold">
-            CONTINUE WORKOUT
+            LATEST WORKOUT
           </p>
 
-          <h2 className="text-4xl font-bold mt-2">
-            {routine.name}
+          <h2 className="text-3xl font-bold mt-2">
+            {workout.routines?.name || "Workout"}
           </h2>
 
-          <p className="text-muted-foreground mt-3">
-            {routine.description || "Ready to train?"}
+          <p className="text-muted-foreground mt-2">
+            {new Date(workout.completed_at).toLocaleString()}
           </p>
 
         </div>
 
-        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-
-          <Icon
-            name="Dumbbell"
-            size={48}
-            className="text-primary"
-          />
-
-        </div>
+        <Icon
+          name="Flame"
+          size={50}
+          className="text-orange-500"
+        />
 
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-2 gap-5 mt-8">
 
         <div className="bg-background rounded-xl p-5">
 
           <p className="text-sm text-muted-foreground">
-            Created
+            Calories
           </p>
 
-          <h3 className="font-bold mt-2">
-            {new Date(routine.created_at).toLocaleDateString()}
+          <h3 className="text-3xl font-bold mt-2">
+            🔥 {workout.calories}
           </h3>
 
         </div>
@@ -88,11 +82,11 @@ export default function TrendingContentCard({
         <div className="bg-background rounded-xl p-5">
 
           <p className="text-sm text-muted-foreground">
-            Status
+            Duration
           </p>
 
-          <h3 className="font-bold mt-2 text-green-500">
-            Ready
+          <h3 className="text-3xl font-bold mt-2">
+            ⏱ {Math.floor(workout.duration / 60)} min
           </h3>
 
         </div>
@@ -100,11 +94,11 @@ export default function TrendingContentCard({
       </div>
 
       <Button
-        className="w-full mt-8 h-14"
-        iconName="Play"
-        onClick={() => navigate(`/workout-session/${routine.id}`)}
+        className="w-full mt-8"
+        iconName="History"
+        onClick={() => navigate("/workout-history")}
       >
-        Start Workout
+        View History
       </Button>
 
     </div>

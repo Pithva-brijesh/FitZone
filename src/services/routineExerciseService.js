@@ -17,7 +17,8 @@ export async function getRoutineExercises(routineId) {
         muscle_group,
         equipment,
         calories_per_min,
-        image_url
+        image_url,
+        instructions
       )
     `)
     .eq("routine_id", routineId)

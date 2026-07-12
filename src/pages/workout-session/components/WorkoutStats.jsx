@@ -3,6 +3,7 @@ import Icon from "../../../components/AppIcon";
 import CircularTimer from "../../../components/ui/CircularTimer";
 
 export default function WorkoutStats({
+  exercise,
   reps,
   calories,
   heartRate,
@@ -53,6 +54,46 @@ export default function WorkoutStats({
 
       {/* Stats */}
 
+      <div className="morphic-card bg-card border border-border rounded-3xl p-6">
+
+        <h2 className="text-xl font-bold mb-5">
+          Current Exercise
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+          <div className="bg-background rounded-xl p-4 text-center">
+            <p className="text-sm text-muted-foreground">Sets</p>
+            <h3 className="text-2xl font-bold">
+              {exercise?.sets || "-"}
+            </h3>
+          </div>
+
+          <div className="bg-background rounded-xl p-4 text-center">
+            <p className="text-sm text-muted-foreground">Reps</p>
+            <h3 className="text-2xl font-bold">
+              {exercise?.reps || "-"}
+            </h3>
+          </div>
+
+          <div className="bg-background rounded-xl p-4 text-center">
+            <p className="text-sm text-muted-foreground">Rest</p>
+            <h3 className="text-2xl font-bold">
+              {exercise?.rest || 60}s
+            </h3>
+          </div>
+
+          <div className="bg-background rounded-xl p-4 text-center">
+            <p className="text-sm text-muted-foreground">Calories/min</p>
+            <h3 className="text-2xl font-bold">
+              {exercise?.caloriesPerMinute || 0}
+            </h3>
+          </div>
+
+        </div>
+
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {stats.map((stat) => (
@@ -68,9 +109,8 @@ export default function WorkoutStats({
               <Icon
                 name={stat.icon}
                 size={30}
-                className={`${stat.color} ${
-                  stat.heartbeat ? "animate-pulse" : ""
-                }`}
+                className={`${stat.color} ${stat.heartbeat ? "animate-pulse" : ""
+                  }`}
               />
             </div>
 

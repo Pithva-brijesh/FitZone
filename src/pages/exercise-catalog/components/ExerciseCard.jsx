@@ -117,7 +117,7 @@ export default function ExerciseCard({
             iconName="Play"
             onClick={(e) => {
               e.stopPropagation();
-              handleCardClick();
+              onAddToRoutine(exercise);
             }}
           >
             Start

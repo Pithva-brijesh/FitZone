@@ -18,7 +18,6 @@ export async function getRoutines() {
   return data;
 }
 
-// NEW
 export async function getRoutine(id) {
   const {
     data: { user },
