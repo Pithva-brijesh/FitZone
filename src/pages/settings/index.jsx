@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
+import { getProfile } from "../../services/profileService";
 
 import SettingsHeader from "./components/SettingsHeader";
 import ProfileSettings from "./components/ProfileSettings";
@@ -17,17 +18,37 @@ import DangerZone from "./components/DangerZone";
 export default function Settings() {
   const navigate = useNavigate();
 
-  const user = {
-    name: "Alex Chen",
-    email: "alex@fitzone.com",
-    streak: 18,
-  };
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
 
       <Header
-        user={user}
+        user={profile}
         onNavigate={(path) => navigate(path)}
       />
 
@@ -35,11 +56,11 @@ export default function Settings() {
 
         <SettingsHeader />
 
-        <ProfileSettings />
+        <ProfileSettings profile={profile} />
 
         <div className="grid xl:grid-cols-2 gap-8">
 
-          <AccountSettings />
+          <AccountSettings profile={profile} />
 
           <AppearanceSettings />
 

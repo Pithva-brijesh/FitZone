@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
 import useAuth from "../../hooks/useAuth";
+
+import { getAchievements } from "../../services/achievementService";
+import { getProgressData } from "../../services/progressService";
 
 import AchievementHeader from "./components/AchievementHeader";
 import XPCard from "./components/XPCard";
@@ -16,8 +19,58 @@ import AchievementTimeline from "./components/AchievementTimeline";
 
 export default function Achievements() {
   const navigate = useNavigate();
-
   const { user } = useAuth();
+
+  const [achievements, setAchievements] = useState([]);
+  const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [achievementData, progressData] =
+          await Promise.all([
+            getAchievements(),
+            getProgressData(),
+          ]);
+
+        setAchievements(achievementData || []);
+        setProgress(progressData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  if (loading || !progress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl">
+        Loading Achievements...
+      </div>
+    );
+  }
+
+  const totalWorkouts = progress.workouts.length;
+
+  const totalCalories = progress.workouts.reduce(
+    (sum, workout) => sum + (workout.calories || 0),
+    0
+  );
+
+  const totalWorkoutHours = Number(
+    (
+      progress.workouts.reduce(
+        (sum, workout) => sum + (workout.duration || 0),
+        0
+      ) / 3600
+    ).toFixed(1)
+  );
+
+  const totalMeals = 0; // Update later when meal tracking is connected
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,27 +86,57 @@ export default function Achievements() {
 
         <div className="grid xl:grid-cols-2 gap-8">
 
-          <XPCard />
+          <XPCard achievements={achievements} />
 
-          <LevelProgress />
+          <LevelProgress achievements={achievements} />
 
         </div>
 
-        <DailyChallenges />
+        <DailyChallenges
+          stats={{
+            totalWorkouts,
+            totalCalories,
+            totalMeals,
+          }}
+        />
 
-        <WeeklyChallenges />
+        <WeeklyChallenges
+          stats={{
+            totalWorkouts,
+            totalCalories,
+            totalWorkoutHours,
+          }}
+        />
 
-        <BadgeGrid />
+        <BadgeGrid
+          achievements={achievements}
+        />
 
         <div className="grid xl:grid-cols-2 gap-8">
 
-          <Milestones />
+          <Milestones
+            stats={{
+              totalWorkouts,
+              totalCalories,
+              totalWorkoutHours,
+            }}
+          />
 
-          <Leaderboard />
+          <Leaderboard
+            profile={progress.profile}
+            stats={{
+              totalWorkouts,
+              totalCalories,
+              totalAchievements:
+                achievements.length,
+            }}
+          />
 
         </div>
 
-        <AchievementTimeline />
+        <AchievementTimeline
+          achievements={achievements}
+        />
 
       </main>
 

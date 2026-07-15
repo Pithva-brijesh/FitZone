@@ -17,6 +17,7 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +35,22 @@ export default function UserProfile() {
           streak: profile.streak ?? 0,
 
           avatar: profile.avatar_url || null,
+
+          calories: profile.calories,
+          workout_hours: profile.workout_hours,
+          achievements: profile.achievementCount,
         });
+
+        setStats({
+          totalWorkouts: profile.workouts.length,
+          totalCalories: profile.calories,
+          workoutHours: profile.workout_hours,
+
+          weeklyActivity: profile.weeklyWorkouts,
+
+          achievements: profile.achievements,
+        });
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -47,15 +63,15 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center text-xl">
+        Loading Profile...
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center text-xl">
         Profile not found.
       </div>
     );
@@ -63,7 +79,6 @@ export default function UserProfile() {
 
   return (
     <div className="min-h-screen bg-background">
-
       <Header
         user={user}
         onNavigate={(path) => navigate(path)}
@@ -73,7 +88,10 @@ export default function UserProfile() {
 
         <ProfileHeader user={user} />
 
-        <ProfileStats user={user} />
+        <ProfileStats
+          user={user}
+          stats={stats}
+        />
 
         <div className="grid lg:grid-cols-3 gap-8">
 
@@ -81,9 +99,14 @@ export default function UserProfile() {
 
             <PersonalInfo user={user} />
 
-            <WeeklyActivity user={user} />
+            <WeeklyActivity
+              data={stats?.weeklyActivity || []}
+            />
 
-            <AchievementPreview user={user} />
+            <AchievementPreview
+              user={user}
+              achievements={stats?.achievements || []}
+            />
 
           </div>
 
@@ -93,14 +116,20 @@ export default function UserProfile() {
 
             <GoalCard user={user} />
 
-            <FitnessLevel user={user} />
+            <FitnessLevel
+              user={user}
+              stats={{
+                workouts: stats?.totalWorkouts || 0,
+                calories: stats?.totalCalories || 0,
+                workoutHours: stats?.workoutHours || 0,
+              }}
+            />
 
           </div>
 
         </div>
 
       </main>
-
     </div>
   );
 }

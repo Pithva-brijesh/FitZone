@@ -72,15 +72,23 @@ export default function ProfileDropdown({ user }) {
         className="flex items-center gap-3 rounded-xl p-2 hover:bg-muted transition"
       >
         <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-          {user?.name?.charAt(0)?.toUpperCase() ||
-            user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ||
-            user?.email?.charAt(0)?.toUpperCase() ||
-            "U"}
+          {(
+            user?.username ||
+            user?.full_name ||
+            user?.name ||
+            user?.user_metadata?.full_name ||
+            user?.email ||
+            "U"
+          )
+            .charAt(0)
+            .toUpperCase()}
         </div>
 
         <div className="hidden lg:block text-left">
           <h4 className="font-semibold text-foreground">
-            {user?.name ||
+            {user?.username ||
+              user?.full_name ||
+              user?.name ||
               user?.user_metadata?.full_name ||
               "User"}
           </h4>

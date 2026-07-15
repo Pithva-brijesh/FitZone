@@ -25,14 +25,36 @@ export default function ProgressTracker() {
 
   const { user } = useAuth();
 
+  const totalWorkouts = progress?.workouts?.length || 0;
+
+  const totalCalories =
+    progress?.workouts?.reduce(
+      (sum, workout) => sum + (workout.calories || 0),
+      0
+    ) || 0;
+
+  const totalMinutes = Math.floor(
+    (progress?.workouts?.reduce(
+      (sum, workout) => sum + (workout.duration || 0),
+      0
+    ) || 0) / 60
+  );
+
+  const streak = progress?.profile?.streak || 0;
+
+  const latestWeight =
+    progress?.weights?.length > 0
+      ? progress.weights.at(-1).weight
+      : progress?.profile?.weight ?? "--";
+
   const overviewData = [
     {
       id: 1,
-      label: "Strength Progress",
-      value: "85%",
-      goal: "100%",
-      progress: 85,
-      change: "+12%",
+      label: "Workouts",
+      value: totalWorkouts,
+      goal: "100",
+      progress: Math.min(totalWorkouts, 100),
+      change: "+",
       icon: "Dumbbell",
       bgColor: "bg-primary/10",
       iconColor: "text-primary",
@@ -41,43 +63,59 @@ export default function ProgressTracker() {
     },
     {
       id: 2,
-      label: "Endurance Level",
-      value: "72%",
-      goal: "90%",
-      progress: 72,
-      change: "+8%",
-      icon: "Heart",
-      bgColor: "bg-success/10",
-      iconColor: "text-success",
-      progressColor: "bg-success",
+      label: "Calories",
+      value: totalCalories,
+      goal: "5000",
+      progress: Math.min((totalCalories / 5000) * 100, 100),
+      change: "+",
+      icon: "Flame",
+      bgColor: "bg-orange-500/10",
+      iconColor: "text-orange-500",
+      progressColor: "bg-orange-500",
       changeColor: "bg-success/10 text-success",
     },
     {
       id: 3,
-      label: "Consistency Streak",
-      value: "12 Days",
-      goal: "30 Days",
-      progress: 40,
-      change: "+3 Days",
-      icon: "Calendar",
-      bgColor: "bg-accent/10",
-      iconColor: "text-accent",
-      progressColor: "bg-accent",
+      label: "Minutes",
+      value: totalMinutes,
+      goal: "300",
+      progress: Math.min((totalMinutes / 300) * 100, 100),
+      change: "+",
+      icon: "Clock",
+      bgColor: "bg-green-500/10",
+      iconColor: "text-green-500",
+      progressColor: "bg-green-500",
       changeColor: "bg-success/10 text-success",
     },
     {
       id: 4,
-      label: "Skill Mastery",
-      value: "68%",
-      goal: "80%",
-      progress: 68,
-      change: "+15%",
+      label: "Streak",
+      value: `${streak} Days`,
+      goal: "30 Days",
+      progress: Math.min((streak / 30) * 100, 100),
+      change: "+",
       icon: "Award",
-      bgColor: "bg-secondary/10",
-      iconColor: "text-secondary",
-      progressColor: "bg-secondary",
+      bgColor: "bg-yellow-500/10",
+      iconColor: "text-yellow-500",
+      progressColor: "bg-yellow-500",
       changeColor: "bg-success/10 text-success",
     },
+    {
+      id: 5,
+      label: "Current Weight",
+      value:
+        latestWeight === "--"
+          ? "--"
+          : `${latestWeight} kg`,
+      goal: "",
+      progress: 100,
+      change: "",
+      icon: "Scale",
+      bgColor: "bg-cyan-500/10",
+      iconColor: "text-cyan-500",
+      progressColor: "bg-cyan-500",
+      changeColor: "",
+    }
   ];
 
   const strengthData =
@@ -89,112 +127,73 @@ export default function ProgressTracker() {
   const enduranceData =
     progress?.workouts?.map((workout, index) => ({
       date: `Workout ${index + 1}`,
-      value: workout.duration / 60,
+      value: Math.floor((workout.duration || 0) / 60),
     })) || [];
 
   const workoutFrequency =
     progress?.workouts?.map((workout, index) => ({
       date: `Workout ${index + 1}`,
-      value: workout.calories,
+      value: workout.calories || 0,
     })) || [];
+
+  /* ---------- Temporary Skills ---------- */
 
   const skillsData = [
     {
       id: 1,
-      name: "Push-up Form",
-      category: "Strength",
-      level: 85,
-      sessions: 24,
-      lastPracticed: "2 days ago",
-      icon: "ArrowUp",
+      name: "Workout Consistency",
+      category: "Fitness",
+      level: Math.min(totalWorkouts * 10, 100),
+      sessions: totalWorkouts,
+      lastPracticed:
+        progress?.workouts?.length > 0
+          ? "Recently"
+          : "Never",
+      icon: "Dumbbell",
       bgColor: "bg-primary/10",
       iconColor: "text-primary",
-      achievements: ["Perfect Form", "50 Reps"],
-    },
-    {
-      id: 2,
-      name: "Running Technique",
-      category: "Cardio",
-      level: 72,
-      sessions: 18,
-      lastPracticed: "Yesterday",
-      icon: "Zap",
-      bgColor: "bg-success/10",
-      iconColor: "text-success",
-      achievements: ["5K Runner"],
+      achievements: [],
     },
   ];
 
+  /* ---------- Temporary Motivation ---------- */
+
   const motivationData = {
-    weeklyMoods: [
-      { date: "8", dayName: "Mon", mood: "good" },
-      { date: "9", dayName: "Tue", mood: "excellent" },
-      { date: "10", dayName: "Wed", mood: "average" },
-      { date: "11", dayName: "Thu", mood: "good" },
-      { date: "12", dayName: "Fri", mood: "excellent" },
-      { date: "13", dayName: "Sat", mood: "good" },
-      { date: "14", dayName: "Sun", mood: null },
-    ],
-    energyLevels: [
-      { date: "Oct 14", time: "9:00 AM", level: 85 },
-      { date: "Oct 13", time: "8:30 AM", level: 78 },
-      { date: "Oct 12", time: "9:15 AM", level: 92 },
-    ],
+    weeklyMoods: [],
+    energyLevels: [],
     goals: [
       {
         id: 1,
         title: "Complete 5 workouts this week",
-        dueDate: "Oct 20",
-        progress: 80,
-        completedTasks: 4,
+        dueDate: "This Week",
+        progress: Math.min(totalWorkouts * 20, 100),
+        completedTasks: totalWorkouts,
         totalTasks: 5,
-        completed: false,
-      },
-      {
-        id: 2,
-        title: "Drink 8 glasses daily",
-        dueDate: "Daily",
-        progress: 100,
-        completedTasks: 8,
-        totalTasks: 8,
-        completed: true,
+        completed: totalWorkouts >= 5,
       },
     ],
   };
 
-  const achievementsData = [
-    {
-      id: 1,
-      title: "First Workout",
-      description: "Complete your first workout",
-      category: "strength",
+  /* ---------- Dynamic Achievements ---------- */
+
+  const achievementsData =
+    progress?.achievements?.map((achievement) => ({
+      id: achievement.id,
+      title:
+        achievement.achievement_name ||
+        achievement.name,
+      description: "Achievement unlocked",
+      category: "fitness",
       rarity: "common",
       unlocked: true,
-      unlockedDate: "Sep 15",
+      unlockedDate: achievement.unlocked_at
+        ? new Date(
+          achievement.unlocked_at
+        ).toLocaleDateString()
+        : "",
       isNew: false,
       progress: 100,
-    },
-    {
-      id: 2,
-      title: "Week Warrior",
-      description: "7-day streak",
-      category: "consistency",
-      rarity: "rare",
-      unlocked: true,
-      unlockedDate: "Oct 8",
-      isNew: true,
-      progress: 100,
-    },
-    {
-      id: 3,
-      title: "Strength Master",
-      description: "Reach 90%",
-      category: "strength",
-      rarity: "epic",
-      unlocked: false,
-      progress: 85,
-    },
-  ];
+    })) || [];
 
   const tabs = [
     { id: "overview", label: "Overview", icon: "BarChart3" },
@@ -239,9 +238,9 @@ export default function ProgressTracker() {
     return (
       <div className="min-h-screen bg-background">
         <Header
-  user={user}
-  onNavigate={(path) => navigate(path)}
-/>
+          user={user}
+          onNavigate={(path) => navigate(path)}
+        />
 
         <div className="flex justify-center items-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
@@ -250,12 +249,41 @@ export default function ProgressTracker() {
     );
   }
 
+  if (
+    progress &&
+    progress.workouts.length === 0 &&
+    progress.weights.length === 0
+  ) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header
+          user={user}
+          onNavigate={(path) => navigate(path)}
+        />
+
+        <main className="flex items-center justify-center h-[70vh]">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center max-w-lg">
+            <div className="text-6xl mb-6">📈</div>
+
+            <h2 className="text-3xl font-bold">
+              No Progress Yet
+            </h2>
+
+            <p className="text-muted-foreground mt-4">
+              Complete workouts and log your weight to start tracking your fitness journey.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header
-  user={user}
-  onNavigate={(path) => navigate(path)}
-/>
+        user={user}
+        onNavigate={(path) => navigate(path)}
+      />
 
       <main className="container mx-auto max-w-7xl px-6 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -269,7 +297,19 @@ export default function ProgressTracker() {
             </p>
           </div>
 
-          <Button>Monthly</Button>
+          <Button
+            onClick={() =>
+              setViewMode(
+                viewMode === "monthly"
+                  ? "weekly"
+                  : "monthly"
+              )
+            }
+          >
+            {viewMode === "monthly"
+              ? "Monthly"
+              : "Weekly"}
+          </Button>
         </div>
 
         <div className="flex gap-2 flex-wrap mb-8">

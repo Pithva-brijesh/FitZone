@@ -1,7 +1,13 @@
 import React from "react";
 import Icon from "../../../components/AppIcon";
 
-export default function AchievementHeader() {
+export default function AchievementHeader({
+  achievements = [],
+  profile = {},
+}) {
+  const badgeCount = achievements.length;
+  const level = profile.level || 1;
+
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
 
@@ -38,10 +44,8 @@ export default function AchievementHeader() {
           </div>
 
           <p className="text-lg text-muted-foreground max-w-2xl">
-
             Every workout gets you closer to your next achievement.
-            Stay consistent, complete challenges, and climb the leaderboard.
-
+            Stay consistent, complete challenges, and level up!
           </p>
 
         </div>
@@ -53,7 +57,7 @@ export default function AchievementHeader() {
           <div className="bg-background rounded-2xl p-5 text-center">
 
             <div className="text-3xl font-bold text-warning">
-              18
+              {badgeCount}
             </div>
 
             <div className="text-sm text-muted-foreground">
@@ -65,7 +69,7 @@ export default function AchievementHeader() {
           <div className="bg-background rounded-2xl p-5 text-center">
 
             <div className="text-3xl font-bold text-primary">
-              Level 8
+              Level {level}
             </div>
 
             <div className="text-sm text-muted-foreground">

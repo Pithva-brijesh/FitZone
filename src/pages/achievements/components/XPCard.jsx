@@ -1,12 +1,23 @@
 import React from "react";
 import Icon from "../../../components/AppIcon";
 
-export default function XPCard() {
-  const totalXP = 8420;
-  const currentLevel = 8;
-  const nextLevelXP = 10000;
+export default function XPCard({ achievements = [] }) {
+  const badgeCount = achievements.length;
 
-  const progress = (totalXP / nextLevelXP) * 100;
+  // 100 XP per achievement
+  const totalXP = badgeCount * 100;
+
+  const currentLevel = Math.floor(totalXP / 1000) + 1;
+
+  const currentLevelXP = (currentLevel - 1) * 1000;
+  const nextLevelXP = currentLevel * 1000;
+
+  const xpIntoLevel = totalXP - currentLevelXP;
+
+  const progress =
+    ((xpIntoLevel / (nextLevelXP - currentLevelXP)) * 100) || 0;
+
+  const xpRemaining = nextLevelXP - totalXP;
 
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
@@ -28,13 +39,11 @@ export default function XPCard() {
         </div>
 
         <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center">
-
           <Icon
             name="Star"
             size={32}
             className="text-warning"
           />
-
         </div>
 
       </div>
@@ -44,9 +53,7 @@ export default function XPCard() {
       <div className="text-center mb-8">
 
         <h1 className="text-6xl font-bold text-warning">
-
           {totalXP.toLocaleString()}
-
         </h1>
 
         <p className="text-muted-foreground mt-2">
@@ -62,15 +69,11 @@ export default function XPCard() {
         <div className="flex justify-between mb-3">
 
           <span className="font-semibold text-foreground">
-
             Level {currentLevel}
-
           </span>
 
           <span className="text-primary font-semibold">
-
-            {nextLevelXP - totalXP} XP to Level {currentLevel + 1}
-
+            {xpRemaining} XP to Level {currentLevel + 1}
           </span>
 
         </div>
@@ -95,11 +98,11 @@ export default function XPCard() {
         <div className="bg-background rounded-2xl p-5 text-center">
 
           <div className="text-2xl font-bold text-primary">
-            +480
+            +{badgeCount * 100}
           </div>
 
           <div className="text-sm text-muted-foreground">
-            This Week
+            Total XP
           </div>
 
         </div>
@@ -107,7 +110,7 @@ export default function XPCard() {
         <div className="bg-background rounded-2xl p-5 text-center">
 
           <div className="text-2xl font-bold text-success">
-            18
+            {badgeCount}
           </div>
 
           <div className="text-sm text-muted-foreground">
@@ -119,7 +122,7 @@ export default function XPCard() {
         <div className="bg-background rounded-2xl p-5 text-center">
 
           <div className="text-2xl font-bold text-warning">
-            #24
+            #{Math.max(1, 100 - badgeCount)}
           </div>
 
           <div className="text-sm text-muted-foreground">

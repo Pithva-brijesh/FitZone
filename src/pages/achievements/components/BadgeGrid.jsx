@@ -1,73 +1,58 @@
 import React from "react";
 import BadgeCard from "./BadgeCard";
 
-export default function BadgeGrid() {
-  const badges = [
+export default function BadgeGrid({ achievements = [] }) {
+  const badgeTemplates = [
     {
       id: 1,
       name: "First Workout",
       description: "Complete your first workout.",
       icon: "Award",
       xp: 100,
-      unlocked: true,
     },
     {
       id: 2,
-      name: "7-Day Streak",
-      description: "Work out for 7 consecutive days.",
+      name: "5 Workouts",
+      description: "Complete five workouts.",
       icon: "Flame",
       xp: 300,
-      unlocked: true,
     },
     {
       id: 3,
-      name: "100 Workouts",
-      description: "Complete 100 workout sessions.",
+      name: "10 Workouts",
+      description: "Complete ten workouts.",
       icon: "Dumbbell",
-      xp: 1000,
-      unlocked: false,
+      xp: 500,
     },
     {
       id: 4,
-      name: "10,000 XP",
-      description: "Earn a total of 10,000 XP.",
-      icon: "Star",
-      xp: 500,
-      unlocked: false,
+      name: "500 Calories Burned",
+      description: "Burn 500 calories.",
+      icon: "Flame",
+      xp: 400,
     },
     {
       id: 5,
-      name: "Nutrition Master",
-      description: "Track your meals for 30 days.",
-      icon: "Apple",
-      xp: 400,
-      unlocked: false,
+      name: "5 Workout Hours",
+      description: "Train for five total hours.",
+      icon: "Clock",
+      xp: 500,
     },
     {
       id: 6,
-      name: "Hydration Hero",
-      description: "Reach your water goal for 14 days.",
-      icon: "Droplets",
-      xp: 350,
-      unlocked: true,
-    },
-    {
-      id: 7,
-      name: "Speed Demon",
-      description: "Finish a HIIT workout under 20 minutes.",
-      icon: "Zap",
-      xp: 250,
-      unlocked: true,
-    },
-    {
-      id: 8,
-      name: "Elite Athlete",
-      description: "Reach Level 10.",
-      icon: "Crown",
-      xp: 1500,
-      unlocked: false,
+      name: "30 Day Streak",
+      description: "Maintain a 30-day streak.",
+      icon: "Calendar",
+      xp: 1000,
     },
   ];
+
+  const badges = badgeTemplates.map((badge) => ({
+    ...badge,
+    unlocked: achievements.some(
+      (a) => a.achievement_name === badge.name
+    ),
+  }));
 
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">

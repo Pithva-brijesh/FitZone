@@ -2,24 +2,34 @@ import React from "react";
 import Icon from "../../../components/AppIcon";
 
 export default function GoalCard({ user }) {
-  const currentWeight = Number(user?.weight);
-  const goalWeight = Number(user?.goalWeight ?? user?.goal_weight);
+  const currentWeight = Number(user?.weight || 0);
+  const goalWeight = Number(
+    user?.goalWeight ?? user?.goal_weight ?? 0
+  );
 
-  let progress = 0;
+  const fitnessGoal =
+    user?.fitness_goal || "Stay Fit";
+
   let remaining = "--";
+  let progress = 0;
 
-  if (!isNaN(currentWeight) && !isNaN(goalWeight)) {
-    remaining = Math.abs(currentWeight - goalWeight).toFixed(1);
+  if (currentWeight > 0 && goalWeight > 0) {
+    remaining = Math.abs(
+      currentWeight - goalWeight
+    ).toFixed(1);
 
-    // Temporary progress calculation
-    const difference = Math.abs(currentWeight - goalWeight);
+    const difference = Math.abs(
+      currentWeight - goalWeight
+    );
+
+    progress = Math.round(
+      ((currentWeight - difference) / currentWeight) *
+        100
+    );
 
     progress = Math.max(
       0,
-      Math.min(
-        100,
-        Math.round((1 - difference / currentWeight) * 100)
-      )
+      Math.min(progress, 100)
     );
   }
 
@@ -70,7 +80,9 @@ export default function GoalCard({ user }) {
 
           <div
             className="h-4 rounded-full bg-primary transition-all duration-700"
-            style={{ width: `${progress}%` }}
+            style={{
+              width: `${progress}%`,
+            }}
           />
 
         </div>
@@ -138,7 +150,7 @@ export default function GoalCard({ user }) {
           </span>
 
           <span className="font-semibold text-foreground">
-            {user?.fitness_goal || "Stay Fit"}
+            {fitnessGoal}
           </span>
 
         </div>
@@ -164,7 +176,8 @@ export default function GoalCard({ user }) {
             </h4>
 
             <p className="text-sm text-muted-foreground mt-2">
-              Every workout brings you one step closer to your goal. Stay consistent and trust the process!
+              Every workout brings you one step closer to your goal.
+              Stay consistent and trust the process!
             </p>
 
           </div>

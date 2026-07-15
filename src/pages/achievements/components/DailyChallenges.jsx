@@ -1,71 +1,35 @@
 import React from "react";
-import BadgeCard from "./BadgeCard";
+import Icon from "../../../components/AppIcon";
 
-export default function BadgeGrid() {
-  const badges = [
+export default function DailyChallenges({ stats = {} }) {
+  const workouts = stats.totalWorkouts || 0;
+  const calories = stats.totalCalories || 0;
+  const meals = stats.totalMeals || 0;
+
+  const challenges = [
     {
       id: 1,
-      name: "First Workout",
-      description: "Complete your first workout.",
-      icon: "Award",
+      title: "Complete 1 Workout",
+      progress: Math.min(workouts, 1),
+      goal: 1,
       xp: 100,
-      unlocked: true,
+      icon: "Dumbbell",
     },
     {
       id: 2,
-      name: "7-Day Streak",
-      description: "Work out for 7 consecutive days.",
+      title: "Burn 300 Calories",
+      progress: Math.min(calories, 300),
+      goal: 300,
+      xp: 150,
       icon: "Flame",
-      xp: 300,
-      unlocked: true,
     },
     {
       id: 3,
-      name: "100 Workouts",
-      description: "Complete 100 workout sessions.",
-      icon: "Dumbbell",
-      xp: 1000,
-      unlocked: false,
-    },
-    {
-      id: 4,
-      name: "10,000 XP",
-      description: "Earn a total of 10,000 XP.",
-      icon: "Star",
-      xp: 500,
-      unlocked: false,
-    },
-    {
-      id: 5,
-      name: "Nutrition Master",
-      description: "Track your meals for 30 days.",
-      icon: "Apple",
-      xp: 400,
-      unlocked: false,
-    },
-    {
-      id: 6,
-      name: "Hydration Hero",
-      description: "Reach your water goal for 14 days.",
-      icon: "Droplets",
-      xp: 350,
-      unlocked: true,
-    },
-    {
-      id: 7,
-      name: "Speed Demon",
-      description: "Finish a HIIT workout under 20 minutes.",
-      icon: "Zap",
-      xp: 250,
-      unlocked: true,
-    },
-    {
-      id: 8,
-      name: "Elite Athlete",
-      description: "Reach Level 10.",
-      icon: "Crown",
-      xp: 1500,
-      unlocked: false,
+      title: "Log 3 Meals",
+      progress: Math.min(meals, 3),
+      goal: 3,
+      xp: 100,
+      icon: "Utensils",
     },
   ];
 
@@ -77,31 +41,95 @@ export default function BadgeGrid() {
       <div className="flex items-center justify-between mb-8">
 
         <div>
-
           <h2 className="text-2xl font-bold text-foreground">
-            Achievement Badges
+            Daily Challenges
           </h2>
 
           <p className="text-muted-foreground">
-            Unlock badges by completing challenges and milestones.
+            Complete today's goals to earn bonus XP.
           </p>
-
         </div>
+
+        <Icon
+          name="Target"
+          size={30}
+          className="text-primary"
+        />
 
       </div>
 
-      {/* Grid */}
+      <div className="space-y-6">
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {challenges.map((challenge) => {
+          const completed = challenge.progress >= challenge.goal;
 
-        {badges.map((badge) => (
+          const percentage =
+            (challenge.progress / challenge.goal) * 100;
 
-          <BadgeCard
-            key={badge.id}
-            badge={badge}
-          />
+          return (
+            <div
+              key={challenge.id}
+              className="bg-background rounded-2xl p-5"
+            >
 
-        ))}
+              <div className="flex justify-between items-center mb-4">
+
+                <div className="flex items-center gap-3">
+
+                  <Icon
+                    name={challenge.icon}
+                    size={22}
+                    className={
+                      completed
+                        ? "text-success"
+                        : "text-primary"
+                    }
+                  />
+
+                  <div>
+
+                    <h3 className="font-semibold text-foreground">
+                      {challenge.title}
+                    </h3>
+
+                    <p className="text-sm text-muted-foreground">
+                      +{challenge.xp} XP
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <span
+                  className={`font-bold ${
+                    completed
+                      ? "text-success"
+                      : "text-primary"
+                  }`}
+                >
+                  {challenge.progress}/{challenge.goal}
+                </span>
+
+              </div>
+
+              <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    completed
+                      ? "bg-success"
+                      : "bg-primary"
+                  }`}
+                  style={{
+                    width: `${percentage}%`,
+                  }}
+                />
+
+              </div>
+
+            </div>
+          );
+        })}
 
       </div>
 

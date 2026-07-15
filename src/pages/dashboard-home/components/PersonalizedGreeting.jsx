@@ -23,13 +23,14 @@ const PersonalizedGreeting = ({ user, streak, motivationalQuote }) => {
     if (streak < 30) return 'on-fire';
     return 'legendary';
   };
+  console.log("Greeting User:", user);
 
   return (
     <div className="fitguide-card p-6 space-y-5 relative overflow-hidden">
       {/* Background Glow Effect */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-secondary/20 to-transparent rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-2xl"></div>
-      
+
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 space-y-3">
@@ -38,7 +39,11 @@ const PersonalizedGreeting = ({ user, streak, motivationalQuote }) => {
                 <Star className="w-6 h-6 text-secondary neon-glow" fill="currentColor" />
               </div>
               <h1 className="font-poppins font-black text-3xl text-foreground">
-                {getGreeting()}, <span className="text-gradient">{user?.name}</span>! 
+                {getGreeting()},{" "}
+                <span className="text-gradient">
+                  {user?.name || user?.full_name || "User"}
+                </span>
+                ! <span className="ml-2 text-2xl">👋</span>
                 <span className="ml-2 text-2xl">👋</span>
               </h1>
             </div>
@@ -56,14 +61,12 @@ const PersonalizedGreeting = ({ user, streak, motivationalQuote }) => {
               </div>
             </div>
           </div>
-          
+
           {streak > 0 && (
-            <div className={`flex items-center space-x-3 px-6 py-3 rounded-2xl glass-effect ${
-              getStreakLevel() === 'legendary' ? 'achievement-glow' : ''
-            } neon-border`}>
-              <Flame className={`w-6 h-6 ${
-                streak >= 30 ? 'text-secondary' : streak >= 7 ? 'text-warning' : 'text-success'
-              } neon-glow`} />
+            <div className={`flex items-center space-x-3 px-6 py-3 rounded-2xl glass-effect ${getStreakLevel() === 'legendary' ? 'achievement-glow' : ''
+              } neon-border`}>
+              <Flame className={`w-6 h-6 ${streak >= 30 ? 'text-secondary' : streak >= 7 ? 'text-warning' : 'text-success'
+                } neon-glow`} />
               <div className="text-center">
                 <div className="font-poppins font-bold text-xl text-gradient">
                   {streak}

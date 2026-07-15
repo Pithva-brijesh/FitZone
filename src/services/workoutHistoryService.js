@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { getCurrentUser } from "./authService";
+import { updateWorkoutStreak } from "./streakService";
 
 export async function saveWorkout({
   routineId,
@@ -18,6 +19,8 @@ export async function saveWorkout({
     });
 
   if (error) throw error;
+
+  await updateWorkoutStreak();
 }
 
 export async function getWorkoutHistory() {

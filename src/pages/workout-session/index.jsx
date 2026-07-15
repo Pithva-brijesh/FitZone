@@ -41,7 +41,7 @@ export default function WorkoutSession() {
   const [isResting, setIsResting] = useState(false);
   const [restTime, setRestTime] = useState(60);
 
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   useEffect(() => {
     loadWorkout();
@@ -149,6 +149,10 @@ export default function WorkoutSession() {
         exercises,
         calories,
       });
+
+      // Refresh the logged-in user's profile
+      // so the latest streak/xp/level are loaded
+      await refreshUser();
 
       console.log("Workout Finished", result);
     } catch (err) {

@@ -1,50 +1,18 @@
 import React from "react";
 import MealCard from "./MealCard";
 
-export default function MealPlanner() {
-  const meals = [
-    {
-      mealName: "Breakfast",
-      icon: "Coffee",
-      calories: 420,
-      protein: 28,
-      carbs: 42,
-      fat: 12,
-      completed: true,
-    },
-    {
-      mealName: "Lunch",
-      icon: "UtensilsCrossed",
-      calories: 650,
-      protein: 45,
-      carbs: 58,
-      fat: 18,
-      completed: true,
-    },
-    {
-      mealName: "Dinner",
-      icon: "Soup",
-      calories: 580,
-      protein: 40,
-      carbs: 52,
-      fat: 15,
-      completed: false,
-    },
-    {
-      mealName: "Snacks",
-      icon: "Apple",
-      calories: 180,
-      protein: 12,
-      carbs: 18,
-      fat: 5,
-      completed: false,
-    },
-  ];
+const icons = {
+  Breakfast: "Coffee",
+  Lunch: "UtensilsCrossed",
+  Dinner: "Soup",
+  Snack: "Apple",
+};
 
+export default function MealPlanner({
+  meals = [],
+}) {
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
-
-      {/* Header */}
 
       <div className="flex items-center justify-between mb-8">
 
@@ -55,33 +23,52 @@ export default function MealPlanner() {
           </h2>
 
           <p className="text-muted-foreground">
-            Your nutrition plan for today
+            Meals you've logged today
           </p>
 
         </div>
 
       </div>
 
-      {/* Meal Cards */}
+      {meals.length === 0 ? (
 
-      <div className="grid md:grid-cols-2 gap-6">
+        <div className="text-center py-16">
 
-        {meals.map((meal) => (
+          <h3 className="text-2xl font-bold">
+            No Meals Logged 🍽️
+          </h3>
 
-          <MealCard
-            key={meal.mealName}
-            mealName={meal.mealName}
-            icon={meal.icon}
-            calories={meal.calories}
-            protein={meal.protein}
-            carbs={meal.carbs}
-            fat={meal.fat}
-            completed={meal.completed}
-          />
+          <p className="text-muted-foreground mt-4">
+            Click the + button to add your first meal.
+          </p>
 
-        ))}
+        </div>
 
-      </div>
+      ) : (
+
+        <div className="grid md:grid-cols-2 gap-6">
+
+          {meals.map((meal) => (
+
+            <MealCard
+              key={meal.id}
+              mealName={meal.food_name}
+              icon={
+                icons[meal.meal_type] ||
+                "UtensilsCrossed"
+              }
+              calories={meal.calories}
+              protein={meal.protein}
+              carbs={meal.carbs}
+              fat={meal.fat}
+              completed={true}
+            />
+
+          ))}
+
+        </div>
+
+      )}
 
     </div>
   );

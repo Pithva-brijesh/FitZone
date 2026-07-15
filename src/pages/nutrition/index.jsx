@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../../components/ui/Header";
 import useAuth from "../../hooks/useAuth";
+import { getNutritionSummary } from "../../services/nutritionService";
 
 import NutritionHeader from "./components/NutritionHeader";
 import DailyCalories from "./components/DailyCalories";
@@ -20,7 +21,31 @@ export default function Nutrition() {
   const { user } = useAuth();
 
   const [showAddMeal, setShowAddMeal] = useState(false);
+  const [nutrition, setNutrition] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadNutrition();
+  }, []);
+
+  async function loadNutrition() {
+    try {
+      const data = await getNutritionSummary();
+      setNutrition(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl">
+        Loading Nutrition...
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-background">
 
@@ -39,7 +64,11 @@ export default function Nutrition() {
 
           <div className="lg:col-span-2">
 
-            <DailyCalories />
+            <DailyCalories
+              consumed={nutrition.calories}
+              goal={2200}
+              burned={0}
+            />
 
           </div>
 
@@ -53,7 +82,7 @@ export default function Nutrition() {
 
           <MacroCard
             title="Protein"
-            consumed={135}
+            consumed={nutrition.protein}
             goal={180}
             color="bg-success"
             icon="Beef"
@@ -61,7 +90,7 @@ export default function Nutrition() {
 
           <MacroCard
             title="Carbohydrates"
-            consumed={220}
+            consumed={nutrition.carbs}
             goal={280}
             color="bg-warning"
             icon="Wheat"
@@ -69,37 +98,37 @@ export default function Nutrition() {
 
           <MacroCard
             title="Fat"
-            consumed={62}
+            consumed={nutrition.fat}
             goal={80}
             color="bg-red-500"
             icon="Droplets"
           />
 
           <MacroCard
-            title="Fiber"
-            consumed={24}
-            goal={35}
+            title="Meals"
+            consumed={nutrition.todaysMeals.length}
+            goal={6}
             color="bg-primary"
-            icon="Leaf"
+            icon="Utensils"
           />
 
         </div>
 
         {/* Meals */}
 
-        <MealPlanner />
+        <MealPlanner meals={nutrition.todaysMeals} />
 
         {/* Bottom */}
 
         <div className="grid lg:grid-cols-2 gap-8">
 
-          <FoodSearch />
+          <FoodSearch onMealAdded={loadNutrition} />
 
           <NutritionInsights />
 
         </div>
 
-        <NutritionChart />
+        <NutritionChart meals={nutrition.meals} />
 
         {/* Floating Button */}
 
@@ -121,6 +150,7 @@ export default function Nutrition() {
       <AddMealModal
         isOpen={showAddMeal}
         onClose={() => setShowAddMeal(false)}
+        onMealAdded={loadNutrition}
       />
 
     </div>

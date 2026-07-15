@@ -9,16 +9,36 @@ import {
   CartesianGrid,
 } from "recharts";
 
-export default function NutritionChart() {
-  const data = [
-    { day: "Mon", calories: 1820 },
-    { day: "Tue", calories: 2100 },
-    { day: "Wed", calories: 1950 },
-    { day: "Thu", calories: 2250 },
-    { day: "Fri", calories: 2050 },
-    { day: "Sat", calories: 2400 },
-    { day: "Sun", calories: 1980 },
-  ];
+export default function NutritionChart({
+  meals = [],
+}) {
+  const chart = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date();
+
+    day.setDate(day.getDate() - i);
+
+    const key = day.toISOString().split("T")[0];
+
+    const calories = meals
+      .filter(
+        (meal) =>
+          meal.created_at.split("T")[0] === key
+      )
+      .reduce(
+        (sum, meal) =>
+          sum + (meal.calories || 0),
+        0
+      );
+
+    chart.push({
+      day: day.toLocaleDateString("en-US", {
+        weekday: "short",
+      }),
+      calories,
+    });
+  }
 
   return (
     <div className="morphic-card bg-card border border-border rounded-3xl p-8">
@@ -39,7 +59,7 @@ export default function NutritionChart() {
 
         <ResponsiveContainer width="100%" height="100%">
 
-          <LineChart data={data}>
+          <LineChart data={chart}>
 
             <CartesianGrid
               strokeDasharray="3 3"

@@ -1,8 +1,8 @@
 import React from "react";
 import Icon from "../../../components/AppIcon";
 
-export default function ProfileStats({ user }) {
-  const stats = [
+export default function ProfileStats({ user, stats }) {
+  const cards = [
     {
       title: "Level",
       value: user?.level ?? 1,
@@ -11,62 +11,56 @@ export default function ProfileStats({ user }) {
       bg: "bg-primary/10",
     },
     {
-      title: "Calories",
-      value: user?.calories ?? 0,
+      title: "Calories Burned",
+      value: stats?.totalCalories ?? 0,
       icon: "Flame",
-      color: "text-warning",
-      bg: "bg-warning/10",
+      color: "text-orange-500",
+      bg: "bg-orange-500/10",
     },
     {
       title: "Workout Hours",
-      value: user?.workout_hours ?? 0,
+      value: (
+        (stats?.totalMinutes ?? 0) / 60
+      ).toFixed(1),
       icon: "Clock3",
-      color: "text-success",
-      bg: "bg-success/10",
+      color: "text-green-500",
+      bg: "bg-green-500/10",
     },
     {
       title: "Achievements",
-      value: user?.achievements ?? 0,
+      value: stats?.achievements?.length ?? 0,
       icon: "Award",
-      color: "text-accent",
-      bg: "bg-accent/10",
+      color: "text-yellow-500",
+      bg: "bg-yellow-500/10",
     },
   ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-
-      {stats.map((stat) => (
-
+      {cards.map((card) => (
         <div
-          key={stat.title}
+          key={card.title}
           className="morphic-card bg-card border border-border rounded-2xl p-6 hover:scale-105 transition-all duration-300"
         >
-
           <div
-            className={`w-14 h-14 rounded-xl ${stat.bg} flex items-center justify-center mb-5`}
+            className={`w-14 h-14 rounded-xl ${card.bg} flex items-center justify-center mb-5`}
           >
-
             <Icon
-              name={stat.icon}
+              name={card.icon}
               size={28}
-              className={stat.color}
+              className={card.color}
             />
-
           </div>
 
           <p className="text-sm text-muted-foreground">
-            {stat.title}
+            {card.title}
           </p>
 
           <h2 className="text-3xl font-bold text-foreground mt-2">
-            {stat.value}
+            {card.value}
           </h2>
-
         </div>
-
       ))}
-
     </div>
   );
 }

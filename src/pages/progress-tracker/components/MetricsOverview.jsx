@@ -3,7 +3,7 @@ import Icon from "../../../components/AppIcon";
 
 const MetricsOverview = ({ overviewData }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
       {overviewData?.map((metric) => (
         <div
           key={metric?.id}
@@ -20,11 +20,13 @@ const MetricsOverview = ({ overviewData }) => {
               />
             </div>
 
-            <div
-              className={`px-2 py-1 rounded-full text-xs font-mono ${metric?.changeColor}`}
-            >
-              {metric?.change}
-            </div>
+            {metric?.change && (
+              <div
+                className={`px-2 py-1 rounded-full text-xs font-mono ${metric?.changeColor}`}
+              >
+                {metric.change}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -43,10 +45,12 @@ const MetricsOverview = ({ overviewData }) => {
               />
             </div>
 
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Goal: {metric?.goal}</span>
-              <span>{metric?.progress}%</span>
-            </div>
+            {metric?.goal && (
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Goal: {metric.goal}</span>
+                <span>{metric.progress}%</span>
+              </div>
+            )}
           </div>
         </div>
       ))}

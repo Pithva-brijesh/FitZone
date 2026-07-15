@@ -30,10 +30,15 @@ export default function AddMealModal({
   }
 
   async function handleSave() {
+    console.log("Saving meal...");
+    console.log(meal);
+
     try {
       setSaving(true);
 
       await addMeal(meal);
+
+      console.log("Meal saved successfully");
 
       setMeal({
         mealType: "Breakfast",
@@ -48,7 +53,7 @@ export default function AddMealModal({
       onMealAdded();
       onClose();
     } catch (err) {
-      console.error(err);
+      console.error("SAVE ERROR:", err);
       alert(err.message);
     } finally {
       setSaving(false);
@@ -57,11 +62,9 @@ export default function AddMealModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6">
-
       <div className="bg-card border border-border rounded-3xl w-full max-w-2xl p-8">
 
         <div className="flex justify-between items-center mb-8">
-
           <div>
             <h2 className="text-3xl font-bold text-foreground">
               Add Meal
@@ -78,7 +81,6 @@ export default function AddMealModal({
           >
             <Icon name="X" size={22} />
           </button>
-
         </div>
 
         <div className="grid md:grid-cols-2 gap-5">
@@ -169,7 +171,6 @@ export default function AddMealModal({
         </div>
 
       </div>
-
     </div>
   );
 }

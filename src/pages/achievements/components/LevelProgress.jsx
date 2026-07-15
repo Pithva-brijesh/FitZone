@@ -1,28 +1,34 @@
 import React from "react";
 import Icon from "../../../components/AppIcon";
 
-export default function LevelProgress() {
-  const currentLevel = 8;
-  const currentXP = 8420;
-  const nextLevelXP = 10000;
+export default function LevelProgress({ achievements = [] }) {
+  const badgeCount = achievements.length;
 
-  const progress = (currentXP / nextLevelXP) * 100;
+  // 100 XP per achievement
+  const totalXP = badgeCount * 100;
+
+  const currentLevel = Math.floor(totalXP / 1000) + 1;
+
+  const currentLevelXP = (currentLevel - 1) * 1000;
+  const nextLevelXP = currentLevel * 1000;
+
+  const progress =
+    ((totalXP - currentLevelXP) /
+      (nextLevelXP - currentLevelXP)) *
+      100 || 0;
 
   const rewards = [
     {
-      level: 9,
-      reward: "Premium Badge",
-      unlocked: false,
+      level: currentLevel + 1,
+      reward: "Fitness Badge",
     },
     {
-      level: 10,
-      reward: "Golden Trophy",
-      unlocked: false,
+      level: currentLevel + 2,
+      reward: "Workout Master",
     },
     {
-      level: 11,
-      reward: "Exclusive Workout Plan",
-      unlocked: false,
+      level: currentLevel + 3,
+      reward: "Elite Athlete",
     },
   ];
 
@@ -40,7 +46,7 @@ export default function LevelProgress() {
           </h2>
 
           <p className="text-muted-foreground">
-            Keep earning XP to unlock exclusive rewards.
+            Keep earning XP to unlock rewards.
           </p>
 
         </div>
@@ -66,7 +72,7 @@ export default function LevelProgress() {
         </div>
 
         <div className="text-muted-foreground mt-2">
-          {currentXP.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
+          {totalXP} / {nextLevelXP} XP
         </div>
 
       </div>
