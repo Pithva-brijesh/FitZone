@@ -106,6 +106,13 @@ This project was developed as a major academic project while following real-worl
 | Git & GitHub       | Version Control      |
 
 ---
+## 🏗️ System Architecture
+
+<p align="center">
+  <img src="README-assets/architecture.png" alt="FitZone System Architecture" width="100%">
+</p>
+
+FitZone follows a modular service-oriented architecture built with React, Vite, Tailwind CSS, and Supabase. The frontend communicates with dedicated service modules that interact with Supabase Authentication and PostgreSQL to manage workouts, nutrition, achievements, progress tracking, and user profiles.
 
 # 📂 Project Structure
 
