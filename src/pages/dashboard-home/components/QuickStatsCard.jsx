@@ -57,9 +57,9 @@ const QuickStatsCard = ({ stats }) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
         {statItems?.map((item) => (
           <div
-  key={item?.key}
-  className="space-y-4 p-2 rounded-xl hover:bg-background/30 transition"
->
+            key={item?.key}
+            className="space-y-4 p-2 rounded-xl hover:bg-background/30 transition"
+          >
             <div className="flex items-center justify-between">
               <div className={`w-10 h-10 rounded-lg ${item?.bgColor} flex items-center justify-center`}>
                 <Icon name={item?.icon} size={20} className={item?.color} />
@@ -70,7 +70,7 @@ const QuickStatsCard = ({ stats }) => {
                 </span>
               )}
             </div>
-            
+
             <div>
               <div className="font-mono font-bold text-xl text-foreground">
                 {item?.value?.toLocaleString()}
@@ -82,7 +82,7 @@ const QuickStatsCard = ({ stats }) => {
 
             {item?.target && (
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className={`h-2 rounded-full transition-all duration-300 ${item?.color?.replace('text-', 'bg-')}`}
                   style={{ width: `${getProgressPercentage(item?.value, item?.target)}%` }}
                 />
