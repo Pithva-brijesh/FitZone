@@ -31,13 +31,21 @@ export async function getRoutineExercises(routineId) {
 
 export async function addExerciseToRoutine(
   routineId,
-  exerciseId
+  exerciseId,
+  sets = 3,
+  reps = "10-12",
+  rest = 60,
+  order = 1
 ) {
   const { error } = await supabase
     .from("routine_exercises")
     .insert({
       routine_id: routineId,
       exercise_id: exerciseId,
+      sets,
+      reps,
+      rest_time: rest,
+      exercise_order: order,
     });
 
   if (error) throw error;

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom";
 import Header from "../../components/ui/Header";
 import WorkoutHeader from "./components/WorkoutHeader";
 import WorkoutVideo from "./components/WorkoutVideo";
@@ -23,6 +26,10 @@ export default function WorkoutSession() {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  const location = useLocation();
+
+  const aiWorkout = location.state?.aiWorkout;
+
   const [loading, setLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
 
@@ -44,8 +51,62 @@ export default function WorkoutSession() {
   const { user, refreshUser } = useAuth();
 
   useEffect(() => {
-    loadWorkout();
+    if (aiWorkout) {
+      loadAIWorkout();
+    } else {
+      loadWorkout();
+    }
   }, [id]);
+
+  async function loadAIWorkout() {
+    try {
+      setRoutine({
+        name: aiWorkout.workout.title,
+      });
+
+      const formatted = aiWorkout.workout.exercises.map((item) => ({
+        id: item.exercise.id,
+
+        name: item.exercise.name,
+
+        description: item.exercise.description,
+
+        instructions: item.exercise.instructions,
+
+        difficulty: item.exercise.difficulty,
+
+        muscle_group: item.exercise.muscle_group,
+
+        equipment: item.exercise.equipment,
+
+        caloriesPerMinute: item.exercise.calories_per_min,
+
+        duration: 30,
+
+        reps: item.reps,
+
+        sets: item.sets,
+
+        rest: item.rest,
+
+        image:
+          item.exercise.image_url ||
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
+      }));
+
+      console.log("========== AI WORKOUT ==========");
+      console.log(aiWorkout);
+
+      console.log("========== FORMATTED ==========");
+      console.log(formatted);
+
+      setExercises(formatted);
+    } catch (err) {
+      console.error("AI Workout Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function loadWorkout() {
     try {
@@ -58,6 +119,8 @@ export default function WorkoutSession() {
       console.error(err);
     }
   }
+
+
 
   async function loadExercises() {
     try {
@@ -92,6 +155,9 @@ export default function WorkoutSession() {
           item.exercises.image_url ||
           "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
       }));
+      console.log("Formatted exercises:");
+      console.log(formatted);
+
       setExercises(formatted);
     } catch (err) {
       console.error(err);

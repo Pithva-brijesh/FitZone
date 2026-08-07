@@ -1,5 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { getCurrentUser } from "./authService";
+import { generateAIWorkout } from "./aiRecommendationService";
+
 
 export async function getDashboardStats() {
   const user = await getCurrentUser();
@@ -102,6 +104,20 @@ export async function getDashboardStats() {
       : null;
 
   // ================================
+  // AI Recommendation
+  // ================================
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  const aiWorkout = profile
+    ? await generateAIWorkout(profile)
+    : null;
+
+  // ================================
   // Weekly Activity
   // ================================
 
@@ -166,6 +182,7 @@ export async function getDashboardStats() {
     totalWorkouts: workouts?.length || 0,
     totalCalories,
     totalMinutes,
+    aiRecommendation: aiWorkout?.recommendation ?? null,
 
     totalRoutines: routines?.length || 0,
 

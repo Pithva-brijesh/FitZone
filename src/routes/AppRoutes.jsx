@@ -18,6 +18,7 @@ import Settings from "../pages/settings";
 import ProfileSetup from "../pages/profile-setup";
 import WorkoutRoutines from "../pages/workout-routines";
 import RoutineDetails from "../pages/routine-details";
+import WorkoutPreview from "../pages/ai-workout-preview";
 
 function PublicRoute() {
   const { user, loading } = useAuth();
@@ -175,6 +176,15 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Achievements />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ai-workout-preview"
+          element={
+            <ProtectedRoute>
+              <WorkoutPreview />
             </ProtectedRoute>
           }
         />

@@ -14,6 +14,9 @@ import QuickActions from "./components/QuickActions";
 import LatestWorkoutCard from "./components/LatestWorkoutCard";
 import NutritionSummaryCard from "./components/NutritionSummaryCard";
 import WeeklyActivityChart from "./components/WeeklyActivityChart";
+import AIRecommendationCard from "../../components/ai/AIRecommendationCard";
+import { generateAIWorkout } from "../../services/aiRecommendationService";
+import { useNavigate } from "react-router-dom";
 
 const quote = {
   text: "Stay strong!",
@@ -22,9 +25,11 @@ const quote = {
 
 export default function DashboardHome() {
   const { loading } = useAuth();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
+  const [recommendation, setRecommendation] = useState(null);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -36,6 +41,9 @@ export default function DashboardHome() {
 
         setProfile(profileData);
         setStats(dashboardStats);
+
+        const aiWorkout = await generateAIWorkout(profileData);
+        setRecommendation(aiWorkout.recommendation);
       } catch (err) {
         console.error(err);
       }
@@ -44,7 +52,25 @@ export default function DashboardHome() {
     loadDashboard();
   }, []);
 
-  if (loading || !profile || !stats) {
+  const handleStartAIWorkout = async () => {
+    try {
+      const aiWorkout = await generateAIWorkout(profile);
+
+      console.log("========== AI WORKOUT ==========");
+      console.log(JSON.stringify(aiWorkout, null, 2));
+      navigate("/ai-workout-preview", {
+        state: {
+          aiWorkout,
+        },
+      });
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate AI workout.");
+    }
+  };
+
+  if (loading || !profile || !stats || !recommendation) {
     return (
       <div className="min-h-screen flex items-center justify-center text-2xl">
         Loading...
@@ -65,6 +91,32 @@ export default function DashboardHome() {
     level: profile.level ?? 1,
   };
 
+  const aiRecommendation = {
+    title: "Today's AI Recommendation",
+
+    workout:
+      profile.goal === "Build Muscle"
+        ? "Upper Body Strength"
+        : profile.goal === "Weight Loss"
+          ? "HIIT Fat Burner"
+          : "Full Body Workout",
+
+    reason: `Based on your goal (${profile.goal}), activity level (${profile.activity_level}), and workout history.`,
+
+    confidence: 94,
+
+    duration: 45,
+
+    calories: 420,
+
+    tips: [
+      "Warm up for 5 minutes.",
+      "Stay hydrated throughout the workout.",
+      "Maintain proper form.",
+      "Stretch after finishing.",
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={profile} />
@@ -76,6 +128,12 @@ export default function DashboardHome() {
           user={profile}
           streak={profile.streak ?? 0}
           motivationalQuote={quote}
+        />
+
+        <AIRecommendationCard
+          recommendation={recommendation}
+          onStartAIWorkout={handleStartAIWorkout}
+          onBuildOwnWorkout={() => navigate("/exercise-catalog")}
         />
 
         {/* Stats */}
@@ -123,6 +181,12 @@ export default function DashboardHome() {
         <QuickActions
           user={profile}
           onQuickStart={() => alert("Workout Started")}
+        />
+
+        <AIRecommendationCard
+          recommendation={recommendation}
+          onStartAIWorkout={handleStartAIWorkout}
+          onBuildOwnWorkout={() => navigate("/routines")}
         />
 
       </main>
