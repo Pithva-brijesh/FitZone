@@ -13,6 +13,7 @@ import ExerciseQueue from "./components/ExerciseQueue";
 import WorkoutComplete from "./components/WorkoutComplete";
 import { getRoutine } from "../../services/routineService";
 import ExerciseInfo from "./components/ExerciseInfo";
+import { completeScheduledWorkout } from "../../services/scheduleService";
 
 
 import { getRoutineExercises } from "../../services/routineExerciseService";
@@ -29,6 +30,8 @@ export default function WorkoutSession() {
   const location = useLocation();
 
   const aiWorkout = location.state?.aiWorkout;
+  const scheduledWorkoutId = location.state?.scheduledWorkoutId;
+  const routineId = location.state?.routineId || id;
 
   const [loading, setLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
@@ -110,7 +113,7 @@ export default function WorkoutSession() {
 
   async function loadWorkout() {
     try {
-      const routineData = await getRoutine(id);
+      const routineData = await getRoutine(routineId);
 
       setRoutine(routineData);
 
@@ -124,7 +127,7 @@ export default function WorkoutSession() {
 
   async function loadExercises() {
     try {
-      const data = await getRoutineExercises(id);
+      const data = await getRoutineExercises(routineId);
 
       const formatted = (data || []).map((item) => ({
         id: item.exercises.id,
@@ -211,7 +214,7 @@ export default function WorkoutSession() {
 
     try {
       const result = await finishWorkout({
-        routineId: id,
+        routineId,
         exercises,
         calories,
       });
@@ -219,6 +222,10 @@ export default function WorkoutSession() {
       // Refresh the logged-in user's profile
       // so the latest streak/xp/level are loaded
       await refreshUser();
+
+      if (scheduledWorkoutId) {
+        await completeScheduledWorkout(scheduledWorkoutId);
+      }
 
       console.log("Workout Finished", result);
     } catch (err) {

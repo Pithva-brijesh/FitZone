@@ -4,6 +4,8 @@ import Header from "../../components/ui/Header";
 import useAuth from "../../hooks/useAuth";
 import { createRoutine } from "../../services/routineService";
 import { addExerciseToRoutine } from "../../services/routineExerciseService";
+import { scheduleWorkout } from "../../services/scheduleService";
+import { getMLRecommendation } from '../../services/mlRecommendationService';
 import {
   Dumbbell,
   Flame,
@@ -21,6 +23,10 @@ export default function WorkoutPreview() {
   const aiWorkout = location.state?.aiWorkout;
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [selectedFocus, setSelectedFocus] = useState("Strength");
+
+  const [scheduleDate, setScheduleDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   if (!aiWorkout) {
     return (
@@ -129,6 +135,42 @@ export default function WorkoutPreview() {
     } catch (err) {
       console.error("SAVE AI ROUTINE ERROR:", err);
       alert(err.message || "Failed to save AI routine");
+    }
+  };
+
+  const scheduleAIWorkout = async () => {
+    try {
+      const routine = await createRoutine(
+        `${workout.title} (AI)`,
+        `AI-generated ${workout.title} workout`
+      );
+
+      for (let i = 0; i < workout.exercises.length; i++) {
+        const item = workout.exercises[i];
+
+        const reps =
+          typeof item.reps === "string"
+            ? parseInt(item.reps.split("-")[0], 10)
+            : item.reps;
+
+        await addExerciseToRoutine(
+          routine.id,
+          item.exercise.id,
+          item.sets,
+          reps,
+          item.rest,
+          i + 1
+        );
+      }
+
+      await scheduleWorkout(routine.id, scheduleDate);
+
+      alert(`Workout scheduled for ${scheduleDate}!`);
+
+      navigate("/dashboard-home");
+    } catch (err) {
+      console.error("SCHEDULE ERROR:", err);
+      alert(err.message || "Failed to schedule workout");
     }
   };
 
@@ -445,6 +487,27 @@ export default function WorkoutPreview() {
           </ul>
         </div>
 
+        <div className="mt-10 bg-background rounded-2xl border border-border p-6">
+          <h2 className="text-xl font-bold mb-4">
+            Schedule this workout
+          </h2>
+
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <input
+              type="date"
+              value={scheduleDate}
+              onChange={(e) => setScheduleDate(e.target.value)}
+              className="px-4 py-3 rounded-xl bg-card border border-border text-white w-full md:w-auto"
+            />
+
+            <button
+              onClick={scheduleAIWorkout}
+              className="px-6 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition font-semibold"
+            >
+              Schedule Workout
+            </button>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row gap-4 mt-10">
           <button
             onClick={regenerateWorkout}

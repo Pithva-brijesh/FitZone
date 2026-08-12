@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+fitzone-ai/*.pkl
+fitzone-ai/models/*.pkl
+fitzone-ai/__pycache__/
