@@ -142,44 +142,59 @@ export default function DashboardHome() {
   };
 
   const quickStats = {
-    weeklyWorkouts: stats.totalWorkouts,
+    weeklyWorkouts: stats?.totalWorkouts ?? 0,
     weeklyTarget: 5,
 
-    totalMinutes: stats.totalMinutes,
+    totalMinutes: stats?.totalMinutes ?? 0,
     minutesTarget: 300,
 
-    caloriesBurned: stats.totalCalories,
+    caloriesBurned: stats?.totalCalories ?? 0,
     caloriesTarget: 2000,
 
-    level: profile.level ?? 1,
+    level: profile?.level ?? 1,
   };
+
+  if (!profile || !stats) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center text-white">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  if (!profile || !stats) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center text-white">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   const aiRecommendation = {
     title: "Today's AI Recommendation",
 
     workout:
-      profile.goal === "Build Muscle"
-        ? "Upper Body Strength"
-        : profile.goal === "Weight Loss"
-          ? "HIIT Fat Burner"
-          : "Full Body Workout",
+  profile?.goal === "Build Muscle"
+    ? "Upper Body Strength"
+    : profile?.goal === "Weight Loss"
+      ? "HIIT Fat Burner"
+      : "Full Body Workout",
 
-    reason: `Based on your goal (${profile.goal}), activity level (${profile.activity_level}), and workout history.`,
+    reason: `Based on your goal (${profile?.goal ?? "General Fitness"}), activity level (${profile?.activity_level ?? "Intermediate"}), and workout history.`,
 
-    confidence: 94,
+    confidence: recommendation?.confidence ?? 94,
 
     duration: 45,
 
-    calories: 420,
+    calories: profile?.estimated_calories ?? 420,
 
-    tips: [
+    tips: recommendation?.tips ?? [
       "Warm up for 5 minutes.",
       "Stay hydrated throughout the workout.",
       "Maintain proper form.",
       "Stretch after finishing.",
     ],
   };
-
   return (
     <div className="min-h-screen bg-background">
       <Header user={profile} />
