@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import joblib
@@ -6,9 +7,23 @@ import pandas as pd
 
 app = FastAPI(title="FitZone AI API")
 
-# --------------------------------------------------
+# -----------------------------
+# CORS (allow React frontend)
+# -----------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -----------------------------
 # Load trained model and encoders
-# --------------------------------------------------
+# -----------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODELS_DIR = BASE_DIR / "models"
 
@@ -16,9 +31,9 @@ model = joblib.load(MODELS_DIR / "workout_model.pkl")
 encoders = joblib.load(MODELS_DIR / "encoders.pkl")
 target_encoder = joblib.load(MODELS_DIR / "target_encoder.pkl")
 
-# --------------------------------------------------
+# -----------------------------
 # Feature order (must match training)
-# --------------------------------------------------
+# -----------------------------
 FEATURES = [
     "age",
     "gender",
@@ -32,12 +47,12 @@ FEATURES = [
     "days_since_last_workout",
     "weekly_workouts",
     "estimated_calories",
-    "recovery_score"
+    "recovery_score",
 ]
 
-# --------------------------------------------------
+# -----------------------------
 # Request schema
-# --------------------------------------------------
+# -----------------------------
 class UserProfile(BaseModel):
     age: int
     gender: str
@@ -53,16 +68,16 @@ class UserProfile(BaseModel):
     estimated_calories: int
     recovery_score: int
 
-# --------------------------------------------------
+# -----------------------------
 # Health check
-# --------------------------------------------------
+# -----------------------------
 @app.get("/")
 def home():
     return {"message": "FitZone AI API is running"}
 
-# --------------------------------------------------
+# -----------------------------
 # Prediction endpoint
-# --------------------------------------------------
+# -----------------------------
 @app.post("/predict")
 def predict(profile: UserProfile):
     try:
@@ -73,14 +88,13 @@ def predict(profile: UserProfile):
             if data[col] not in encoders[col].classes_:
                 return {
                     "error": f"Unknown value for {col}: {data[col]}",
-                    "allowed_values": encoders[col].classes_.tolist()
+                    "allowed_values": encoders[col].classes_.tolist(),
                 }
             data[col] = encoders[col].transform([data[col]])[0]
 
         # Build dataframe in the exact training order
         df = pd.DataFrame([[data[f] for f in FEATURES]], columns=FEATURES)
 
-        # Predict probabilities
         probabilities = model.predict_proba(df)[0]
         top_indices = probabilities.argsort()[-3:][::-1]
 
